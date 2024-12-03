@@ -1,0 +1,1 @@
+Ao comprar, o comprador já avalia o produto e o vendedor. O anúncio fica com uma flag que gerará um modal de avaliação do comprador na home do vendedor.

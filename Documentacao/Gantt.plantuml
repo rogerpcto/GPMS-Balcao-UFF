@@ -1,0 +1,44 @@
+@startgantt
+
+language pt
+
+monday are closed
+tuesday are closed
+wednesday are closed
+thursday are closed
+
+Project starts on 2024-10-16
+
+[Levantamento de Requisitos] lasts 1 day and is colored in LightBlue
+[Gestão de Projeto] lasts 1 day and starts at [Levantamento de Requisitos]'s end  and is colored in LightBlue
+[Planejamento Técnico] lasts 12 days and starts at [Gestão de Projeto]'s end  and is colored in LightBlue
+[Diagramas do Projeto] lasts 1 day and starts at [Planejamento Técnico]'s end  and is colored in LightBlue
+[Criar repositório backend] lasts 1 day and starts at [Diagramas do Projeto]'s end  and is colored in LightBlue
+[Criar repositório frontend] lasts 1 day and starts at [Diagramas do Projeto]'s end  and is colored in LightBlue
+[Criar fluxo de CI] lasts 2 days and starts at [Criar repositório backend]'s end  and is colored in Green
+[Criar boilerplate do projeto backend] lasts 1 day and starts at [Criar repositório backend]'s end  and is colored in Green
+[Criar boilerplate do projeto frontend] lasts 1 day and starts at [Criar repositório frontend]'s end  and is colored in Green
+[Modelar banco de dados] lasts 2 days and starts at [Diagramas do Projeto]'s end  and is colored in Green
+[Criar banco de dados] lasts 3 days and starts at [Modelar banco de dados]'s end  and is colored in Green
+[Criar conta backend] lasts 1 day and starts at [Criar banco de dados]'s end  and is colored in Green
+[Criar conta frontend] lasts 1 day and starts at [Criar banco de dados]'s end  and is colored in Green
+[Login backend] lasts 1 day and starts at [Criar conta backend]'s end  and is colored in Yellow
+[Login frontend] lasts 1 day and starts at [Criar conta frontend]'s end  and is colored in Yellow
+[Logout backend] lasts 1 day and starts at [Login backend]'s end  and is colored in Yellow
+[Logout frontend] lasts 1 day and starts at [Login frontend]'s end  and is colored in Yellow
+[Detalhar perfil backend] lasts 2 days and starts at [Criar conta backend]'s end  and is colored in Yellow
+[Detalhar perfil frontend] lasts 2 days and starts at [Criar conta frontend]'s end  and is colored in Yellow
+[Cadastro de anúncio backend] lasts 5 days and starts at [Criar conta backend]'s end  and is colored in Yellow
+[Cadastro de anúncio frontend] lasts 5 days and starts at [Criar conta frontend]'s end  and is colored in Yellow
+[Busca de anúncios e filtros backend] lasts 5 days and starts at [Cadastro de anúncio backend]'s end  and is colored in Yellow
+[Busca de anúncios e filtros frontend] lasts 3 days and starts at [Cadastro de anúncio frontend]'s end  and is colored in Yellow
+[Detalhar anúncio backend] lasts 2 days and starts at [Cadastro de anúncio backend]'s end  and is colored in Yellow
+[Detalhar anúncio frontend] lasts 3 days and starts at [Cadastro de anúncio frontend]'s end  and is colored in Yellow
+[Avaliar anúncio backend] lasts 3 days and starts at [Cadastro de anúncio backend]'s end  and is colored in Yellow
+[Avaliar anúncio frontend] lasts 3 days and starts at [Cadastro de anúncio frontend]'s end  and is colored in Yellow
+[Ativação e desativação de anúncio backend] lasts 1 day and starts at [Cadastro de anúncio backend]'s end  and is colored in Yellow
+[Ativação e desativação de anúncio frontend] lasts 1 day and starts at [Cadastro de anúncio frontend]'s end  and is colored in Yellow
+[Criação de chat backend] lasts 8 days and starts at [Cadastro de anúncio backend]'s end  and is colored in Yellow
+[Criação de chat frontend] lasts 8 days and starts at [Cadastro de anúncio frontend]'s end  and is colored in Yellow
+
+@endgantt

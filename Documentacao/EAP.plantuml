@@ -1,0 +1,68 @@
+@startuml EAP
+skinparam backgroundColor #FAF3CC
+skinparam rectangle {
+  BackgroundColor #E5ECF6
+  BorderColor #547DB2
+  FontColor black
+}
+
+rectangle "Balcão UFF" {
+  rectangle "4. Implementação e Testes" {
+    rectangle "4.1. Teste manual"
+    rectangle "4.2. Documentação"
+    rectangle "4.3. Hospedagem"
+  }
+
+  rectangle "3. Desenvolvimento" {
+    rectangle "3.1. Criar Conta"
+    rectangle "3.2. Autenticação"
+    rectangle "3.3. Logout"
+    rectangle "3.4. Detalhar Perfil"
+    rectangle "3.5. Busca de Anúncio e filtros"
+    rectangle "3.6. Detalhar Anúncios"
+    rectangle "3.7. Cadastro de Anúncio"
+    rectangle "3.8. Avaliação de Anúncio"
+    rectangle "3.9. Ativação/Desativação de Anúncio"
+    rectangle "3.10. Criação de chat"
+  }
+
+  rectangle "2. Estruturação" {
+    rectangle "2.1. Criação de repositório Backend"
+    rectangle "2.2. Criação de repositório Frontend"
+    rectangle "2.3. Criar fluxo de CI"
+    rectangle "2.4. Criar boilerplate do projeto Backend"
+    rectangle "2.5. Criar boilerplate do projeto Frontend"
+    rectangle "2.6. Criação de Infraestrutura do projeto"
+  }
+
+  rectangle "1. Planejamento" {
+    rectangle "1.1. Levantamento de requisitos"
+    rectangle "1.2. Gestão de Projeto"
+    rectangle "1.3. Planejamento técnico"
+    rectangle "1.4. Diagramas do Projeto"
+  }
+}
+
+"1.1. Levantamento de requisitos" -down-> "1.2. Gestão de Projeto"
+"1.2. Gestão de Projeto" -down-> "1.3. Planejamento técnico"
+"1.3. Planejamento técnico" -down-> "1.4. Diagramas do Projeto"
+
+"2.1. Criação de repositório Backend" -down-> "2.2. Criação de repositório Frontend"
+"2.2. Criação de repositório Frontend" -down-> "2.3. Criar fluxo de CI"
+"2.3. Criar fluxo de CI" -down-> "2.4. Criar boilerplate do projeto Backend"
+"2.4. Criar boilerplate do projeto Backend" -down-> "2.5. Criar boilerplate do projeto Frontend"
+"2.5. Criar boilerplate do projeto Frontend" -down-> "2.6. Criação de Infraestrutura do projeto"
+
+"3.1. Criar Conta" -down-> "3.2. Autenticação"
+"3.2. Autenticação" -down-> "3.3. Logout"
+"3.3. Logout" -down-> "3.4. Detalhar Perfil"
+"3.4. Detalhar Perfil" -down-> "3.5. Busca de Anúncio e filtros"
+"3.5. Busca de Anúncio e filtros" -down-> "3.6. Detalhar Anúncios"
+"3.6. Detalhar Anúncios" -down-> "3.7. Cadastro de Anúncio"
+"3.7. Cadastro de Anúncio" -down-> "3.8. Avaliação de Anúncio"
+"3.8. Avaliação de Anúncio" -down-> "3.9. Ativação/Desativação de Anúncio"
+"3.9. Ativação/Desativação de Anúncio" -down-> "3.10. Criação de chat"
+
+"4.1. Teste manual" -down-> "4.2. Documentação"
+"4.2. Documentação" -down-> "4.3. Hospedagem"
+@enduml

@@ -1,0 +1,85 @@
+@startuml diagrama
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam nodesep 200
+skinparam ranksep 150
+
+class Usuario{
+    + Email : string
+    + Nome : string
+    + Senha : string
+    + Nota : float
+
+    + Logar() : void
+    + Logout() : void
+}
+
+enum Perfil{
+    Administrador
+    Usuario
+}
+
+class Anuncio{
+    + Titulo : string
+    + Descricao : string
+    + Ativo : bool
+    + Nota : float
+    + DataCriacao : DateTime
+    + Preco : float
+    + Quantidade : int
+
+    + EhServico() : bool
+    + Pausar() : void
+    + IniciarCompra(Usuario comprador) : Compra
+}
+
+class Compra{
+    + Status : StatusCompra
+    + AguardarPagamento() : void
+    + EfetuarPagamento() : void
+    + ConfirmarPagamento() : void
+    + ConfirmarRecebimento() : void
+    + AvaliarComprador() : void
+    + AvaliarVendedor() : void
+    + FecharCompra() : void
+    + CancelarCompra() : void
+}
+
+enum StatusCompra{
+    ' Começa o chat entre o vendedor e o comprador
+    Negociando
+    ' Vendedor escolhe aguardar pagamento -> Remove uma quantidade do produto (>1 ou serviço)
+    AguardandoPagamento
+    ' Comprador envia o comprovante do pagamento
+    PagamentoEfetuado
+    ' Vendedor confirma que recebeu o pagamento
+    PagamentoConfirmado
+    ' Comprador confirma que recebeu o produto
+    ProdutoRecebido
+    ' Ambos se avaliam, dando notas
+    Concluido
+    ' Vendedor pode cancelar uma compra, caso o status da compra seja anterior a PagamentoConfirmado
+    Cancelado
+}
+
+class Imagem{
+    + Url : string
+}
+
+class Mensagem{
+    + TimeStamp : DateTime
+    + Conteudo : string
+}
+
+Usuario --> "1" Perfil : + Perfil : Perfil
+Anuncio --> "1" Usuario : + Proprietario : Usuario
+Anuncio --> "1...*" Imagem : + Imagem : List<Imagem>
+Anuncio --> Compra : + Compras : List<Compra>
+Usuario --> "1...*" Compra : + Compras : List<Compra>
+Compra --> Usuario : + Comprador : Usuario
+Compra --> Anuncio : + Assunto : Anuncio
+Compra --> "1" Usuario : + Autor : Usuario
+Compra --> "1...*" Mensagem : + Mensagens : List<Mensagem>
+Compra --> "1*" StatusCompra : + Status : StatusCompra
+
+@enduml
