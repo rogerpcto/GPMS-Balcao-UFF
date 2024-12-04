@@ -1,0 +1,24 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "YourStrongPassword123!"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    
+  balcao.api:
+    image: ${DOCKER_REGISTRY-}balcaoapi
+    build:
+      context: .
+      dockerfile: Balcao.API/Dockerfile
+    depends_on:
+      - sqlserver
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=BalcaoDB;User=sa;Password=YourStrongPassword123!;Pooling=true;Max Pool Size=400;TrustServerCertificate=True;"
+
+volumes:
+  sqlserver-data:

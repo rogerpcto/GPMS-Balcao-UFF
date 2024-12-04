@@ -7,7 +7,7 @@
     <RootNamespace>Balcao_API</RootNamespace>
     <UserSecretsId>befd3890-18b9-4860-aca7-b2e2087c941e</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileContext>.</DockerfileContext>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>

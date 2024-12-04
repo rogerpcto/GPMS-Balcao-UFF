@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Balcao_API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]s")]
     public class UsuarioController : ControllerBase
     {
         private readonly ILogger<UsuarioController> _logger;
@@ -27,6 +27,18 @@ namespace Balcao_API.Controllers
             return Ok(usuarios);
         }
 
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult Get(int id)
+        {
+            var usuario = _usuarioRepository.Get(id);
+
+            if (usuario == null)
+                return NotFound();
+
+            return Ok(usuario);
+        }
+
         [HttpPost]
         public IActionResult Create(UsuarioDTO usuarioDTO)
         {
@@ -35,7 +47,40 @@ namespace Balcao_API.Controllers
             usuario.Senha = usuarioDTO.Senha;
             usuario.Email = usuarioDTO.Email;
             _usuarioRepository.Add(usuario);
-            return Created();
+            return CreatedAtAction(
+                nameof(Get),
+                new { id = usuario.Id },
+                usuario);
         }
+
+        [HttpPut]
+        [Route("{id}")]
+        public IActionResult Update(int id, UsuarioDTO usuarioDTO)
+        {
+            var usuario = _usuarioRepository.Get(id);
+
+            if (usuario == null)
+                return NotFound();
+
+            usuario.Nome = usuarioDTO.Nome;
+            usuario.Senha = usuarioDTO.Senha;
+            usuario.Email = usuarioDTO.Email;
+            _usuarioRepository.Update(usuario);
+            return Ok(usuario);
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var usuario = _usuarioRepository.Get(id);
+
+            if (usuario == null)
+                return NotFound();
+
+            _usuarioRepository.Delete(usuario);
+            return Ok(usuario);
+        }
+
     }
 }
