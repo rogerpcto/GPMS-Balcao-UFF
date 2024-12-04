@@ -38,11 +38,20 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
+      - name: Check if any changes were made
+        run: |
+          git diff --exit-code || echo "Changes detected" > result.txt
+        id: check_changes
+
       - name: Commit and push changes
         run: |
-          git add .
-          git commit -m "Apply code formatting with dotnet format"
-          git push origin HEAD:main
+          if [ -f result.txt ]; then
+            git add .
+            git commit -m "Apply code formatting with dotnet format"
+            git push origin HEAD:main
+          else
+            echo "No changes to commit."
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: github.event_name != 'push' || github.actor != 'github-actions[bot]' # Prevent infinite loop
