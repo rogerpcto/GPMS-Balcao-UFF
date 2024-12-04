@@ -1,7 +1,8 @@
-﻿namespace Balcao_API.Models
+﻿namespace Balcao.Domain.Entities
 {
     public class Compra
     {
+        public int Id { get; set; }
         public StatusCompra Status { get; set; }
         public Usuario Comprador { get; set; }
         public Usuario Autor { get; set; }
