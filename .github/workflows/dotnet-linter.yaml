@@ -49,7 +49,7 @@ jobs:
             git add .
             git commit -m "Apply code formatting with dotnet format"
             CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-            git push "$CURRENT_BRANCH"
+            git push HEAD:"$CURRENT_BRANCH"
           else
             echo "No changes to commit."
           fi
