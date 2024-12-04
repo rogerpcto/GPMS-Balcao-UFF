@@ -33,7 +33,7 @@ jobs:
       - name: Run dotnet format on Backend/Balcao.Infrastructure
         run: dotnet format ./Backend/Balcao.Infrastructure/Balcao.Infrastructure.csproj --verbosity diagnostic
 
-      -  - name: Set up Git
+      - name: Set up Git
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
@@ -54,4 +54,4 @@ jobs:
             echo "No changes to commit."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: github.event_name != 'push' || github.actor != 'github-actions[bot]' 
+        if: github.event_name != 'push' || github.actor != 'github-actions[bot]'
