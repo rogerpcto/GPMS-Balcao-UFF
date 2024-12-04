@@ -24,11 +24,25 @@ jobs:
       - name: Install dotnet-format tool
         run: dotnet tool install -g dotnet-format
 
-      - name: Run dotnet format
-        run: dotnet format ./Backend/Balcao-API/Balcao-API.csproj --verify-no-changes --verbosity diagnostic
+      - name: Run dotnet format on Backend/Balcao-API
+        run: dotnet format ./Backend/Balcao-API/Balcao-API.csproj --verbosity diagnostic
 
-      - name: Run dotnet format
-        run: dotnet format ./Backend/Balcao.Domain/Balcao.Domain.csproj --verify-no-changes --verbosity diagnostic
+      - name: Run dotnet format on Backend/Balcao.Domain
+        run: dotnet format ./Backend/Balcao.Domain/Balcao.Domain.csproj --verbosity diagnostic
 
-      - name: Run dotnet format
-        run: dotnet format ./Backend/Balcao.Infrastructure/Balcao.Infrastructure.csproj --verify-no-changes --verbosity diagnostic
+      - name: Run dotnet format on Backend/Balcao.Infrastructure
+        run: dotnet format ./Backend/Balcao.Infrastructure/Balcao.Infrastructure.csproj --verbosity diagnostic
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "Apply code formatting with dotnet format"
+          git push origin HEAD:main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: github.event_name != 'push' || github.actor != 'github-actions[bot]' # Prevent infinite loop
