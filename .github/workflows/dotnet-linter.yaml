@@ -1,0 +1,34 @@
+name: C# Linter
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0"
+
+      - name: Install dotnet-format tool
+        run: dotnet tool install -g dotnet-format
+
+      - name: Run dotnet format
+        run: dotnet format ./Backend/Balcao-API/Balcao-API.csproj --verify-no-changes --verbosity diagnostic
+
+      - name: Run dotnet format
+        run: dotnet format ./Backend/Balcao.Domain/Balcao.Domain.csproj --verify-no-changes --verbosity diagnostic
+
+      - name: Run dotnet format
+        run: dotnet format ./Backend/Balcao.Infrastructure/Balcao.Infrastructure.csproj --verify-no-changes --verbosity diagnostic
