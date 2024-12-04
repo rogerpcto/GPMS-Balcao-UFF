@@ -45,26 +45,26 @@ jobs:
 
       - name: Commit and push changes
         run: |
-         if [ -f result.txt ]; then
-  # Get the current branch name
-  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          if [ -f result.txt ]; then
+            # Get the current branch name
+            CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-  # If in detached HEAD state, use the HEAD reference
-  if [ "$CURRENT_BRANCH" == "HEAD" ]; then
-    echo "We're in a detached HEAD state, but we will commit to the branch we came from."
-    # Set the branch as 'main' or any branch you want to commit to
-    CURRENT_BRANCH=$(git reflog show --no-abbrev | head -n 1 | awk '{print $NF}')
-  fi
+            # If in detached HEAD state, use the HEAD reference
+            if [ "$CURRENT_BRANCH" == "HEAD" ]; then
+              echo "We're in a detached HEAD state, but we will commit to the branch we came from."
+              # Set the branch as 'main' or any branch you want to commit to
+              CURRENT_BRANCH=$(git reflog show --no-abbrev | head -n 1 | awk '{print $NF}')
+            fi
 
-  # Stage and commit the changes
-  git add .
-  git commit -m "Apply code formatting with dotnet format"
+            # Stage and commit the changes
+            git add .
+            git commit -m "Apply code formatting with dotnet format"
 
-  # Push the changes to the same branch
-  git push origin "$CURRENT_BRANCH"
-else
-  echo "No changes to commit."
-fi
+            # Push the changes to the same branch
+            git push origin "$CURRENT_BRANCH"
+          else
+            echo "No changes to commit."
+          fi
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
