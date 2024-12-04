@@ -1,4 +1,4 @@
-﻿namespace Balcao_API.Models
+﻿namespace Balcao.Domain.Entities
 {
     public enum StatusCompra
     {
