@@ -18,7 +18,7 @@ namespace Balcao_API.Controllers
         }
 
         [HttpGet]
-        public IActionResult List()
+        public IActionResult List()  
         {
             // Exemplo do uso de LINQ
             //var usuarioLogan = _usuarioRepository.Query().Where(usuario => usuario.Nome == "Logan");
