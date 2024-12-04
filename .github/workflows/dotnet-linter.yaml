@@ -24,11 +24,46 @@ jobs:
       - name: Install dotnet-format tool
         run: dotnet tool install -g dotnet-format
 
-      - name: Run dotnet format
-        run: dotnet format ./Backend/Balcao-API/Balcao-API.csproj --verify-no-changes --verbosity diagnostic
+      - name: Run dotnet format on Backend/Balcao-API
+        run: dotnet format ./Backend/Balcao-API/Balcao-API.csproj --verbosity diagnostic
 
-      - name: Run dotnet format
-        run: dotnet format ./Backend/Balcao.Domain/Balcao.Domain.csproj --verify-no-changes --verbosity diagnostic
+      - name: Run dotnet format on Backend/Balcao.Domain
+        run: dotnet format ./Backend/Balcao.Domain/Balcao.Domain.csproj --verbosity diagnostic
 
-      - name: Run dotnet format
-        run: dotnet format ./Backend/Balcao.Infrastructure/Balcao.Infrastructure.csproj --verify-no-changes --verbosity diagnostic
+      - name: Run dotnet format on Backend/Balcao.Infrastructure
+        run: dotnet format ./Backend/Balcao.Infrastructure/Balcao.Infrastructure.csproj --verbosity diagnostic
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Check if any changes were made
+        run: |
+          git diff --exit-code || echo "Changes detected" > result.txt
+        id: check_changes
+
+      - name: Commit and push changes
+        run: |
+          if [ -f result.txt ]; then
+            CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+            if [ "$CURRENT_BRANCH" == "HEAD" ]; then
+              echo "We're in a detached HEAD state, using the source branch for the PR."
+              CURRENT_BRANCH="${GITHUB_HEAD_REF}"  
+
+              git fetch origin "$CURRENT_BRANCH"
+              git checkout "$CURRENT_BRANCH"
+            fi
+
+            git add . && git reset result.txt
+            git commit -m "Apply code formatting with dotnet format"
+
+            git push origin "$CURRENT_BRANCH"
+          else
+            echo "No changes to commit."
+          fi
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: github.event_name == 'pull_request' || github.actor != 'github-actions[bot]'
