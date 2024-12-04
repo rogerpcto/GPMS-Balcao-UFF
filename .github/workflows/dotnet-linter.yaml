@@ -52,7 +52,6 @@ jobs:
             git push origin "$CURRENT_BRANCH"
           else
             echo "No changes to commit."
-          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: github.event_name != 'push' || github.actor != 'github-actions[bot]' 
