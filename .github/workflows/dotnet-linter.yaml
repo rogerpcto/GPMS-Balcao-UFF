@@ -22,7 +22,7 @@ jobs:
           dotnet-version: "8.0"
 
       - name: Install dotnet-format tool
-        run: dotnet tool install dotnet-format
+        run: dotnet tool install -g dotnet-format
 
       - name: Run dotnet format on Backend/Balcao-API
         run: dotnet format ./Backend/Balcao-API/Balcao-API.csproj --verbosity diagnostic
