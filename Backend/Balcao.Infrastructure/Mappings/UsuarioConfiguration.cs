@@ -9,13 +9,13 @@ namespace Balcao.Infrastructure.Mappings
         public void Configure(EntityTypeBuilder<Usuario> builder)
         {
             #region Key
-            
+
             builder.HasKey(u => u.Id);
 
             #endregion
 
             #region Properties
-            
+
             builder.Property(u => u.Email)
                 .IsRequired()
                 .HasMaxLength(200);
@@ -41,7 +41,7 @@ namespace Balcao.Infrastructure.Mappings
             #endregion
 
             #region Relationships
-            
+
             builder.HasMany(u => u.Compras)
                 .WithOne(c => c.Comprador)
                 .OnDelete(DeleteBehavior.NoAction);
