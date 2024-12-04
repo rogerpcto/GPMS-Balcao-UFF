@@ -52,5 +52,35 @@ namespace Balcao_API.Controllers
                 new { id = usuario.Id },
                 usuario);
         }
+
+        [HttpPut]
+        [Route("{id}")]
+        public IActionResult Update(int id, UsuarioDTO usuarioDTO)
+        {
+            var usuario = _usuarioRepository.Get(id);
+
+            if (usuario == null)
+                return NotFound();
+
+            usuario.Nome = usuarioDTO.Nome;
+            usuario.Senha = usuarioDTO.Senha;
+            usuario.Email = usuarioDTO.Email;
+            _usuarioRepository.Update(usuario);
+            return Ok(usuario);
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var usuario = _usuarioRepository.Get(id);
+
+            if (usuario == null)
+                return NotFound();
+
+            _usuarioRepository.Delete(usuario);
+            return Ok(usuario);
+        }
+
     }
 }
