@@ -12,13 +12,18 @@ services:
     
   balcao.api:
     image: ${DOCKER_REGISTRY-}balcaoapi
+    container_name: balcao.api
+    ports:
+      - "57829:80"
+      - "57830:443"
     build:
       context: .
       dockerfile: Balcao.API/Dockerfile
     depends_on:
       - sqlserver
     environment:
-      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=BalcaoDB;User=sa;Password=YourStrongPassword123!;Pooling=true;Max Pool Size=400;TrustServerCertificate=True;"
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=BalcaoDB;User=sa;Password=YourStrongPassword123!;Pooling=true;Max Pool Size=400;TrustServerCertificate=True;
 
 volumes:
   sqlserver-data:
