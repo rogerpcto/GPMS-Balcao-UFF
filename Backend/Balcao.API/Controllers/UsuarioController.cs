@@ -42,9 +42,11 @@ namespace Balcao_API.Controllers
         [HttpPost]
         public IActionResult Create(UsuarioDTO usuarioDTO)
         {
+            string salt = BCrypt.Net.BCrypt.GenerateSalt(10);
+
             Usuario usuario = new Usuario();
             usuario.Nome = usuarioDTO.Nome;
-            usuario.Senha = usuarioDTO.Senha;
+            usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuarioDTO.Senha, salt);
             usuario.Email = usuarioDTO.Email;
             _usuarioRepository.Add(usuario);
             return CreatedAtAction(
@@ -60,6 +62,7 @@ namespace Balcao_API.Controllers
             var usuario = _usuarioRepository.Get(id);
 
             if (usuario == null)
+
                 return NotFound();
 
             usuario.Nome = usuarioDTO.Nome;
@@ -82,5 +85,27 @@ namespace Balcao_API.Controllers
             return Ok(usuario);
         }
 
+        [HttpPost]
+        [Route("login")]
+        public IActionResult Login(UsuarioDTO usuarioDTO)
+        {
+            if (usuarioDTO == null)
+            {
+                return BadRequest("Invalid login request");
+            }
+
+            var usuario = _usuarioRepository.Query().FirstOrDefault(x => x.Email == usuarioDTO.Email);
+            if (usuario == null)
+            {
+                return NotFound("User not found");
+            }
+
+            if (!usuario.Logar(usuarioDTO.Senha, usuario.Senha))
+            {
+                return Unauthorized("Invalid credentials");
+            }
+
+            return Ok(usuario);
+        }
     }
 }
