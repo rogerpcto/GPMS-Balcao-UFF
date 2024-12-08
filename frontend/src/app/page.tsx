@@ -1,101 +1,243 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import Image from "next/image";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+// Simulated product data
+const products = [
+  {
+    id: 1,
+    name: "Produto",
+    image: "/imgs/produto.png",
+    date: "2023-07-01",
+    location: "São Paulo",
+    category: "eletronicos",
+    price: "99,99",
+  },
+  {
+    id: 2,
+    name: "Produto",
+    image: "/imgs/produto.png",
+    date: "2023-07-02",
+    location: "Rio de Janeiro",
+    price: "99,99",
+  },
+  {
+    id: 3,
+    name: "Produto",
+    image: "/imgs/produto.png",
+    date: "2023-07-03",
+    location: "Belo Horizonte",
+    price: "99,99",
+  },
+  {
+    id: 1,
+    name: "Produto",
+    image: "/imgs/produto.png",
+    date: "2023-07-01",
+    location: "São Paulo",
+    category: "eletronicos",
+    price: "99,99",
+  },
+  {
+    id: 2,
+    name: "Produto",
+    image: "/imgs/produto.png",
+    date: "2023-07-02",
+    location: "Rio de Janeiro",
+    price: "99,99",
+  },
+  {
+    id: 3,
+    name: "Produto",
+    image: "/imgs/produto.png",
+    date: "2023-07-03",
+    location: "Belo Horizonte",
+    price: "99,99",
+  },
+  {
+    id: 1,
+    name: "Produto",
+    image: "/imgs/produto.png",
+    date: "2023-07-01",
+    location: "São Paulo",
+    category: "eletronicos",
+    price: "99,99",
+  },
+  {
+    id: 2,
+    name: "Produto",
+    image: "/imgs/produto.png",
+    date: "2023-07-02",
+    location: "Rio de Janeiro",
+    price: "99,99",
+  },
+  {
+    id: 3,
+    name: "Produto",
+    price: "99,99",
+    image: "/imgs/produto.png",
+    date: "2023-07-03",
+    location: "Belo Horizonte",
+  },
+  {
+    id: 1,
+    name: "Produto",
+    price: "99,99",
+    image: "/imgs/produto.png",
+    date: "2023-07-01",
+    location: "São Paulo",
+    category: "eletronicos",
+  },
+  {
+    id: 2,
+    name: "Produto",
+    price: "99,99",
+    image: "/imgs/produto.png",
+    date: "2023-07-02",
+    location: "Rio de Janeiro",
+  },
+  {
+    id: 3,
+    name: "Produto",
+    price: "99,99",
+    image: "/imgs/produto.png",
+    date: "2023-07-03",
+    location: "Belo Horizonte",
+  },
+  {
+    id: 1,
+    name: "Produto",
+    price: "99,99",
+    image: "/imgs/produto.png",
+    date: "2023-07-01",
+    location: "São Paulo",
+    category: "eletronicos",
+  },
+  {
+    id: 2,
+    name: "Produto",
+    price: "99,99",
+    image: "/imgs/produto.png",
+    date: "2023-07-02",
+    location: "Rio de Janeiro",
+  },
+  {
+    id: 3,
+    name: "Produto",
+    price: "99,99",
+    image: "/imgs/produto.png",
+    date: "2023-07-03",
+    location: "Belo Horizonte",
+  },
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  // Add more products as needed
+];
+
+export default function Home() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [category, setCategory] = useState("");
+  const [location, setLocation] = useState("");
+  const [priceRange, setPriceRange] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (category === "" || product.category === category) &&
+      (location === "" || product.location === location)
+    // Price range filter would be implemented here if we had price data
+  );
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1 container py-6 mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Produtos e Serviços</h1>
+          <Button
+            onClick={() => setShowFilters(!showFilters)}
+            variant="outline"
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            {showFilters ? "Esconder Filtros" : "Mostrar Filtros"}
+          </Button>
+        </div>
+
+        {showFilters && (
+          <div className="flex space-x-4 mb-6">
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="eletronicos">Eletrônicos</SelectItem>
+                <SelectItem value="moveis">Móveis</SelectItem>
+                <SelectItem value="roupas">Roupas</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={location} onValueChange={setLocation}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Localização" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sao-paulo">São Paulo</SelectItem>
+                <SelectItem value="rio-de-janeiro">Rio de Janeiro</SelectItem>
+                <SelectItem value="belo-horizonte">Belo Horizonte</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={priceRange} onValueChange={setPriceRange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Faixa de Preço" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0-100">R$ 0 - R$ 100</SelectItem>
+                <SelectItem value="100-500">R$ 100 - R$ 500</SelectItem>
+                <SelectItem value="500+">R$ 500+</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProducts.map((product) => (
+            <Link href={`/anuncio/${product.id}`} key={product.id}>
+              <Card className="overflow-hidden">
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-48 object-cover"
+                  width={500}
+                  height={500}
+                  priority
+                />
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-lg font-semibold">{product.name}</h2>
+                    <span className="text-xl font-bold">
+                      R$ {product.price}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-500">
+                    Anunciado em: {product.date}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Localização: {product.location}
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
