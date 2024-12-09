@@ -2,6 +2,7 @@ using Balcao.Domain.DTOs;
 using Balcao.Domain.Entities;
 using Balcao.Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Balcao_API.Controllers
 {
@@ -11,11 +12,13 @@ namespace Balcao_API.Controllers
     {
         private readonly ILogger<UsuarioController> _logger;
         private readonly IGenericRepository<Usuario> _usuarioRepository;
+        private readonly IGenericRepository<Anuncio> _anuncioRepository;
 
-        public UsuarioController(IGenericRepository<Usuario> usuarioRepository, ILogger<UsuarioController> logger)
+        public UsuarioController(IGenericRepository<Usuario> usuarioRepository, IGenericRepository<Anuncio> anuncioRepository, ILogger<UsuarioController> logger)
         {
             _logger = logger;
             _usuarioRepository = usuarioRepository;
+            _anuncioRepository = anuncioRepository;
         }
 
         [HttpGet]
@@ -82,5 +85,32 @@ namespace Balcao_API.Controllers
             return Ok(usuario);
         }
 
+
+        [HttpPost]
+        [Route("{id}/criarAnuncio")]
+        public IActionResult Create(int id, AnuncioDTO anuncioDTO)
+        {
+            var usuario = _usuarioRepository.Get(id);
+            if (usuario == null){
+                return NotFound();
+            }
+            Anuncio anuncio = new Anuncio();
+            anuncio.Proprietario = usuario;
+            anuncio.Titulo = anuncioDTO.Titulo; 
+            anuncio.Ativo = anuncioDTO.Ativo;
+            anuncio.Descricao = anuncioDTO.Descricao;
+            anuncio.Preco = anuncioDTO.Preco;
+            anuncio.Quantidade = anuncioDTO.Quantidade;
+            //Precisamos receber um boolean do front, perguntando se o tipo do Anúncio é Serviço ou Produto.
+            //Se for Serviço, set quantidade < 1. Se for Produto, set quantidade = quantidade recebida
+            DateTime dateTime = DateTime.UtcNow;
+            TimeZoneInfo horaBrasilia = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+            anuncio.DataCriacao = TimeZoneInfo.ConvertTimeFromUtc(dateTime, horaBrasilia);
+            _anuncioRepository.Add(anuncio);
+            return CreatedAtAction(
+                nameof(Get),
+                new { id = anuncio.Id },
+                anuncio);
+        }
     }
 }

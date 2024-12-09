@@ -16,12 +16,16 @@
 
         public bool EhServico()
         {
-            throw new NotImplementedException();
+            if (Quantidade < 0)
+            {
+                return true;
+            }
+            return false;
         }
 
         public void Pausar()
         {
-            throw new NotImplementedException();
+            Ativo = false;
         }
 
         public Compra IniciarCompra(Usuario comprador)

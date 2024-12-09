@@ -12,6 +12,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Register repositories
 builder.Services.AddScoped<IGenericRepository<Usuario>, GenericRepository<Usuario>>();
+builder.Services.AddScoped<IGenericRepository<Anuncio>, GenericRepository<Anuncio>>();
 
 builder.Services.AddCors(options =>
 {
