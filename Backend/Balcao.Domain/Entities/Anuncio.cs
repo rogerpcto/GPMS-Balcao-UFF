@@ -10,9 +10,9 @@
         public DateTime DataCriacao { get; set; }
         public float Preco { get; set; }
         public int Quantidade { get; set; }
-        public Usuario Proprietario { get; set; }
-        public List<Imagem> Imagem { get; set; } = new List<Imagem>();
-        public List<Compra> Compras { get; set; } = new List<Compra>();
+        public virtual Usuario Proprietario { get; set; }
+        public virtual List<Imagem> Imagem { get; set; } = new List<Imagem>();
+        public virtual List<Compra> Compras { get; set; } = new List<Compra>();
 
         public bool EhServico()
         {
