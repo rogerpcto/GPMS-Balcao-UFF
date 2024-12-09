@@ -91,18 +91,18 @@ namespace Balcao_API.Controllers
         {
             if (usuarioDTO == null)
             {
-                return BadRequest("Invalid login request");
+                return BadRequest();
             }
 
             var usuario = _usuarioRepository.Query().FirstOrDefault(x => x.Email == usuarioDTO.Email);
             if (usuario == null)
             {
-                return NotFound("User not found");
+                return NotFound();
             }
 
             if (!usuario.Logar(usuarioDTO.Senha, usuario.Senha))
             {
-                return Unauthorized("Invalid credentials");
+                return Unauthorized();
             }
 
             return Ok(usuario);
