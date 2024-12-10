@@ -65,7 +65,7 @@ namespace Balcao_API.Controllers
             var usuario = _usuarioRepository.Get(anuncioDTO.UsuarioId);
             if (usuario == null)
             {
-                return NotFound();
+                return Unauthorized();
             }
             if (usuario.Id != anuncio.Proprietario.Id && usuario.Perfil == Perfil.USUARIO) 
             {
@@ -75,7 +75,14 @@ namespace Balcao_API.Controllers
             anuncio.Titulo = anuncioDTO.Titulo;
             anuncio.Descricao = anuncioDTO.Descricao;
             anuncio.Preco = anuncioDTO.Preco;
-            anuncio.Quantidade = anuncioDTO.Quantidade;
+            if (anuncioDTO.Quantidade != null && anuncioDTO.Quantidade >= 0)
+            {
+            anuncio.Quantidade = anuncioDTO.Quantidade.Value;
+            }
+            else
+            {
+            anuncio.Quantidade = -1;
+            }
             anuncio.Ativo = anuncioDTO.Ativo;
             _anuncioRepository.Update(anuncio);
             return Ok(anuncio);
@@ -93,7 +100,7 @@ namespace Balcao_API.Controllers
             var usuario = _usuarioRepository.Get(anuncioDTO.UsuarioId);
             if (usuario == null)
             {
-                return NotFound();
+                return Unauthorized();
             }
             if (usuario.Id != anuncio.Proprietario.Id && usuario.Perfil == Perfil.USUARIO) //adicionar condição tambem se usuario nao for do Perfil admin
             {

@@ -100,7 +100,7 @@ namespace Balcao_API.Controllers
             anuncio.Ativo = anuncioDTO.Ativo;
             anuncio.Descricao = anuncioDTO.Descricao;
             anuncio.Preco = anuncioDTO.Preco;
-            anuncio.Quantidade = anuncioDTO.Quantidade;
+            anuncio.Quantidade = anuncioDTO.Quantidade.Value;
             //Precisamos receber um boolean do front, perguntando se o tipo do Anúncio é Serviço ou Produto.
             //Se for Serviço, set quantidade < 1. Se for Produto, set quantidade = quantidade recebida
             DateTime dateTime = DateTime.UtcNow;
