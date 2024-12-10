@@ -100,9 +100,16 @@ namespace Balcao_API.Controllers
             anuncio.Ativo = anuncioDTO.Ativo;
             anuncio.Descricao = anuncioDTO.Descricao;
             anuncio.Preco = anuncioDTO.Preco;
+            if (anuncioDTO.Quantidade != null && anuncioDTO.Quantidade >= 0)
+            {
             anuncio.Quantidade = anuncioDTO.Quantidade.Value;
-            //Precisamos receber um boolean do front, perguntando se o tipo do Anúncio é Serviço ou Produto.
-            //Se for Serviço, set quantidade < 1. Se for Produto, set quantidade = quantidade recebida
+            }
+            else
+            {
+            anuncio.Quantidade = -1;
+            }
+            //Precisamos receber um boolean do front, perguntando se o tipo do Anï¿½ncio ï¿½ Serviï¿½o ou Produto.
+            //Se for Serviï¿½o, set quantidade < 1. Se for Produto, set quantidade = quantidade recebida
             DateTime dateTime = DateTime.UtcNow;
             TimeZoneInfo horaBrasilia = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
             anuncio.DataCriacao = TimeZoneInfo.ConvertTimeFromUtc(dateTime, horaBrasilia);
