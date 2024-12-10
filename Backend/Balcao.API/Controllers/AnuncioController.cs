@@ -76,11 +76,11 @@ namespace Balcao_API.Controllers
             anuncio.Preco = anuncioDTO.Preco;
             if (anuncioDTO.Quantidade != null && anuncioDTO.Quantidade >= 0)
             {
-            anuncio.Quantidade = anuncioDTO.Quantidade.Value;
+                anuncio.Quantidade = anuncioDTO.Quantidade.Value;
             }
             else
             {
-            anuncio.Quantidade = -1;
+                anuncio.Quantidade = -1;
             }
             anuncio.Ativo = anuncioDTO.Ativo;
             _anuncioRepository.Update(anuncio);

@@ -114,22 +114,23 @@ namespace Balcao_API.Controllers
         public IActionResult Create(int id, AnuncioDTO anuncioDTO)
         {
             var usuario = _usuarioRepository.Get(id);
-            if (usuario == null){
+            if (usuario == null)
+            {
                 return NotFound();
             }
             Anuncio anuncio = new Anuncio();
             anuncio.Proprietario = usuario;
-            anuncio.Titulo = anuncioDTO.Titulo; 
+            anuncio.Titulo = anuncioDTO.Titulo;
             anuncio.Ativo = anuncioDTO.Ativo;
             anuncio.Descricao = anuncioDTO.Descricao;
             anuncio.Preco = anuncioDTO.Preco;
             if (anuncioDTO.Quantidade != null && anuncioDTO.Quantidade >= 0)
             {
-            anuncio.Quantidade = anuncioDTO.Quantidade.Value;
+                anuncio.Quantidade = anuncioDTO.Quantidade.Value;
             }
             else
             {
-            anuncio.Quantidade = -1;
+                anuncio.Quantidade = -1;
             }
             //Precisamos receber um boolean do front, perguntando se o tipo do An�ncio � Servi�o ou Produto.
             //Se for Servi�o, set quantidade < 1. Se for Produto, set quantidade = quantidade recebida
