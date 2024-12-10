@@ -13,22 +13,20 @@ namespace Balcao.Domain.Entities
         public Perfil Perfil { get; set; }
         public List<Compra> Compras { get; set; } = new List<Compra>();
 
-        public bool Logar(string requisicaoSenha, string senha)
+        public bool Logar(string requisicaoSenha)
         {
-            if (string.IsNullOrEmpty(senha))
-            {
-                return false;
-            }
+            return BCrypt.Net.BCrypt.Verify(requisicaoSenha, Senha);
+        }
 
-            return VerificarSenha(requisicaoSenha, senha);
-        }
-        private bool VerificarSenha(string requisicaoSenha, string senha)
-        {
-            return BCrypt.Net.BCrypt.Verify(requisicaoSenha, senha);
-        }
         public void Logout()
         {
             throw new NotImplementedException();
+        }
+
+        public static string Criptografar(string senha)
+        {
+            string salt = BCrypt.Net.BCrypt.GenerateSalt(10);
+            return BCrypt.Net.BCrypt.HashPassword(senha, salt);
         }
     }
 

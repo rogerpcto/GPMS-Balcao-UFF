@@ -42,11 +42,9 @@ namespace Balcao_API.Controllers
         [HttpPost]
         public IActionResult Create(UsuarioDTO usuarioDTO)
         {
-            string salt = BCrypt.Net.BCrypt.GenerateSalt(10);
-
             Usuario usuario = new Usuario();
             usuario.Nome = usuarioDTO.Nome;
-            usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuarioDTO.Senha, salt);
+            usuario.Senha = Usuario.Criptografar(usuarioDTO.Senha);
             usuario.Email = usuarioDTO.Email;
             _usuarioRepository.Add(usuario);
             return CreatedAtAction(
@@ -100,7 +98,7 @@ namespace Balcao_API.Controllers
                 return NotFound();
             }
 
-            if (!usuario.Logar(usuarioDTO.Senha, usuario.Senha))
+            if (!usuario.Logar(usuarioDTO.Senha))
             {
                 return Unauthorized();
             }
