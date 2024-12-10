@@ -12,10 +12,11 @@ import Link from "next/link";
 import { Input } from "../../../../../balcao-uff/src/components/ui/input";
 import { Button } from "../../../../../balcao-uff/src/components/ui/button";
 import { useState } from "react";
+import { useAuth } from "@/context/auth-context";
 
 export function Header() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const { isLoggedIn } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -49,20 +50,8 @@ export function Header() {
             <Shapes className="h-4 w-4 mr-2 inline-block" />
             Meus anúncios
           </Link>
-          {isLoggedIn ? (
-            <Link href="/perfil/1">
-              <Button size="sm" variant="ghost">
-                <User className="h-4 w-4" />
-              </Button>
-            </Link>
-          ) : (
-            <Link href="/login">
-              <Button size="sm" variant="outline">
-                Entrar
-              </Button>
-            </Link>
-          )}
         </nav>
+
         <div className="flex items-center ml-auto">
           <Input
             type="search"
@@ -75,6 +64,31 @@ export function Header() {
             <Search className="h-4 w-4" />
           </Button>
         </div>
+
+        <nav className="flex items-center space-x-4 lg:space-x-6 mx-6">
+          {isLoggedIn ? (
+            <Link href="/perfil/1">
+              <Button size="sm" variant="ghost">
+                <User className="h-4 w-4" />
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/Cadastro"
+                className="text-sm font-medium transition-colors hover:text-primary"
+              >
+                Criar conta
+              </Link>
+
+              <Link href="/login">
+                <Button size="sm" variant="outline">
+                  Entrar
+                </Button>
+              </Link>
+            </>
+          )}
+        </nav>
       </div>
     </header>
   );

@@ -29,6 +29,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 
 const loginSchema = z.object({
+  nome: z.string(),
   email: z
     .string()
     .email("E-mail inválido")
@@ -41,13 +42,14 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  const { setIsLoggedIn } = useAuth();
-
   const router = useRouter();
+
+  const { setIsLoggedIn } = useAuth();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
+      nome: "",
       email: "",
       password: "",
     },
@@ -55,10 +57,12 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
+      // Aqui você faria a chamada para sua API de autenticação
+      console.log("Login attempt:", data);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       await login(data.email, data.password);
-
       setIsLoggedIn(true);
-
       router.push("/");
     } catch (err: unknown) {
       console.log(err);
@@ -70,12 +74,29 @@ export default function LoginPage() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Login</CardTitle>
-          <CardDescription>Entre com sua conta UFF</CardDescription>
+          <CardTitle>Cadastro</CardTitle>
+          <CardDescription>Crie sua conta no Balcão UFF</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="nome"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome completo</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Digite seu nome completo"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="email"
@@ -120,11 +141,10 @@ export default function LoginPage() {
               <AlertDescription>{loginError}</AlertDescription>
             </Alert>
           )}
-
           <p className="mt-4">
-            Não tem conta?{" "}
-            <a href="/cadastro" className="text-blue-500 underline">
-              Cadastre-se
+            Já tem conta?{" "}
+            <a href="/login" className="text-blue-500 underline">
+              Clique aqui
             </a>
           </p>
         </CardFooter>
