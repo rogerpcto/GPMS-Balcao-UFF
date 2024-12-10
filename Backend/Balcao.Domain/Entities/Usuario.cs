@@ -10,8 +10,8 @@ namespace Balcao.Domain.Entities
         [JsonIgnore]
         public string Senha { get; set; }
         public float Nota { get; set; }
-        public Perfil Perfil { get; set; }
-        public List<Compra> Compras { get; set; } = new List<Compra>();
+        public virtual Perfil Perfil { get; set; }
+        public virtual List<Compra> Compras { get; set; } = new List<Compra>();
 
         public bool Logar(string requisicaoSenha)
         {

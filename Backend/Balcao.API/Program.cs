@@ -8,10 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register repositories
 builder.Services.AddScoped<IGenericRepository<Usuario>, GenericRepository<Usuario>>();
+builder.Services.AddScoped<IGenericRepository<Anuncio>, GenericRepository<Anuncio>>();
 
 builder.Services.AddCors(options =>
 {

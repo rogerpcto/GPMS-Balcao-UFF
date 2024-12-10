@@ -4,10 +4,10 @@
     {
         public int Id { get; set; }
         public StatusCompra Status { get; set; }
-        public Usuario Comprador { get; set; }
-        public Usuario Autor { get; set; }
-        public Anuncio Assunto { get; set; }
-        public List<Mensagem> Mensagens { get; set; } = new List<Mensagem>();
+        public virtual Usuario Comprador { get; set; }
+        public virtual Usuario Autor { get; set; }
+        public virtual Anuncio Assunto { get; set; }
+        public virtual List<Mensagem> Mensagens { get; set; } = new List<Mensagem>();
 
         public void AguardarPagamento()
         {
