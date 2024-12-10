@@ -44,7 +44,7 @@ namespace Balcao_API.Controllers
         {
             Usuario usuario = new Usuario();
             usuario.Nome = usuarioDTO.Nome;
-            usuario.Senha = usuarioDTO.Senha;
+            usuario.Senha = Usuario.Criptografar(usuarioDTO.Senha);
             usuario.Email = usuarioDTO.Email;
             _usuarioRepository.Add(usuario);
             return CreatedAtAction(
@@ -60,6 +60,7 @@ namespace Balcao_API.Controllers
             var usuario = _usuarioRepository.Get(id);
 
             if (usuario == null)
+
                 return NotFound();
 
             usuario.Nome = usuarioDTO.Nome;
@@ -82,5 +83,27 @@ namespace Balcao_API.Controllers
             return Ok(usuario);
         }
 
+        [HttpPost]
+        [Route("login")]
+        public IActionResult Login(UsuarioDTO usuarioDTO)
+        {
+            if (usuarioDTO == null)
+            {
+                return BadRequest();
+            }
+
+            var usuario = _usuarioRepository.Query().FirstOrDefault(x => x.Email == usuarioDTO.Email);
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+
+            if (!usuario.Logar(usuarioDTO.Senha))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(usuario);
+        }
     }
 }
