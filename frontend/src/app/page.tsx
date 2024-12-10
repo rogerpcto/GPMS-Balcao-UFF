@@ -41,7 +41,7 @@ const products = [
     price: "99,99",
   },
   {
-    id: 1,
+    id: 4,
     name: "Produto",
     image: "/imgs/produto.png",
     date: "2023-07-01",
@@ -50,7 +50,7 @@ const products = [
     price: "99,99",
   },
   {
-    id: 2,
+    id: 5,
     name: "Produto",
     image: "/imgs/produto.png",
     date: "2023-07-02",
@@ -58,7 +58,7 @@ const products = [
     price: "99,99",
   },
   {
-    id: 3,
+    id: 6,
     name: "Produto",
     image: "/imgs/produto.png",
     date: "2023-07-03",
@@ -66,7 +66,7 @@ const products = [
     price: "99,99",
   },
   {
-    id: 1,
+    id: 7,
     name: "Produto",
     image: "/imgs/produto.png",
     date: "2023-07-01",
@@ -75,7 +75,7 @@ const products = [
     price: "99,99",
   },
   {
-    id: 2,
+    id: 8,
     name: "Produto",
     image: "/imgs/produto.png",
     date: "2023-07-02",
@@ -83,7 +83,7 @@ const products = [
     price: "99,99",
   },
   {
-    id: 3,
+    id: 9,
     name: "Produto",
     price: "99,99",
     image: "/imgs/produto.png",
@@ -91,7 +91,7 @@ const products = [
     location: "Belo Horizonte",
   },
   {
-    id: 1,
+    id: 10,
     name: "Produto",
     price: "99,99",
     image: "/imgs/produto.png",
@@ -100,7 +100,7 @@ const products = [
     category: "eletronicos",
   },
   {
-    id: 2,
+    id: 11,
     name: "Produto",
     price: "99,99",
     image: "/imgs/produto.png",
@@ -108,7 +108,7 @@ const products = [
     location: "Rio de Janeiro",
   },
   {
-    id: 3,
+    id: 12,
     name: "Produto",
     price: "99,99",
     image: "/imgs/produto.png",
@@ -116,7 +116,7 @@ const products = [
     location: "Belo Horizonte",
   },
   {
-    id: 1,
+    id: 13,
     name: "Produto",
     price: "99,99",
     image: "/imgs/produto.png",
@@ -125,7 +125,7 @@ const products = [
     category: "eletronicos",
   },
   {
-    id: 2,
+    id: 14,
     name: "Produto",
     price: "99,99",
     image: "/imgs/produto.png",
@@ -133,7 +133,7 @@ const products = [
     location: "Rio de Janeiro",
   },
   {
-    id: 3,
+    id: 15,
     name: "Produto",
     price: "99,99",
     image: "/imgs/produto.png",
