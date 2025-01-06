@@ -7,6 +7,11 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
+## Fix de um problema de SSL https://github.com/dotnet/runtime/issues/98797#issuecomment-1961125933
+USER root
+RUN echo "\n[openssl_init]\nssl_conf = ssl_sect\n\n[ssl_sect]\nsystem_default = system_default_sect\n\n[system_default_sect]\nCipherString = DEFAULT@SECLEVEL=2" >> /etc/ssl/openssl.cnf
+USER app
+
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
