@@ -11,7 +11,8 @@ namespace Balcao.Domain.Entities
         public string Senha { get; set; }
         public float Nota { get; set; }
         public virtual Perfil Perfil { get; set; }
-        public virtual List<Compra> Compras { get; set; } = new List<Compra>();
+        public virtual List<Compra> ComprasAutor { get; set; } = new List<Compra>();
+        public virtual List<Compra> ComprasComprador { get; set; } = new List<Compra>();
 
         public bool Logar(string requisicaoSenha)
         {
@@ -27,6 +28,12 @@ namespace Balcao.Domain.Entities
         {
             string salt = BCrypt.Net.BCrypt.GenerateSalt(10);
             return BCrypt.Net.BCrypt.HashPassword(senha, salt);
+        }
+
+        public void Avaliar(float nota)
+        {
+            int comprasConcluidas = ComprasAutor.Where(c => c.Status == StatusCompra.CONCLUIDO).Count() + ComprasComprador.Where(c => c.Status == StatusCompra.CONCLUIDO).Count();
+            Nota = ((Nota * comprasConcluidas) + nota) / (comprasConcluidas + 1);
         }
     }
 

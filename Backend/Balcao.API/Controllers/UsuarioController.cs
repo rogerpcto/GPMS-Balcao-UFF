@@ -2,7 +2,6 @@ using Balcao.Domain.DTOs;
 using Balcao.Domain.Entities;
 using Balcao.Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace Balcao_API.Controllers
 {
@@ -121,7 +120,6 @@ namespace Balcao_API.Controllers
             Anuncio anuncio = new Anuncio();
             anuncio.Proprietario = usuario;
             anuncio.Titulo = anuncioDTO.Titulo;
-            anuncio.Ativo = anuncioDTO.Ativo;
             anuncio.Descricao = anuncioDTO.Descricao;
             anuncio.Preco = anuncioDTO.Preco;
             if (anuncioDTO.Quantidade != null && anuncioDTO.Quantidade >= 0)

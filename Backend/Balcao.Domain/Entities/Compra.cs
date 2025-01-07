@@ -3,7 +3,9 @@
     public class Compra
     {
         public int Id { get; set; }
-        public StatusCompra Status { get; set; }
+        public int Quantidade { get; set; }
+        public float Nota { get; set; } = -1;
+        public StatusCompra Status { get; set; } = StatusCompra.NEGOCIANDO;
         public virtual Usuario Comprador { get; set; }
         public virtual Usuario Autor { get; set; }
         public virtual Anuncio Assunto { get; set; }
@@ -34,9 +36,11 @@
             throw new NotImplementedException();
         }
 
-        public void AvaliarVendedor()
+        public void AvaliarVendedor(float nota)
         {
-            throw new NotImplementedException();
+            Nota = nota;
+            Assunto.Avaliar(nota);
+            Autor.Avaliar(nota);
         }
 
         public void FecharCompra()

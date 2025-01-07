@@ -32,5 +32,10 @@
         {
             throw new NotImplementedException();
         }
+
+        public void Avaliar(float nota)
+        {
+            Nota = ((Nota * Compras.Count) + nota) / (Compras.Count + 1);
+        }
     }
 }

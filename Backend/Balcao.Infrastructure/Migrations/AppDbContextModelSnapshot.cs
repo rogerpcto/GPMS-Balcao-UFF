@@ -18,6 +18,9 @@ namespace Balcao.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -73,9 +76,6 @@ namespace Balcao.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AnuncioId")
-                        .HasColumnType("int");
-
                     b.Property<int>("AssuntoId")
                         .HasColumnType("int");
 
@@ -85,14 +85,18 @@ namespace Balcao.Infrastructure.Migrations
                     b.Property<int>("CompradorId")
                         .HasColumnType("int");
 
+                    b.Property<float>("Nota")
+                        .HasColumnType("real");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AnuncioId");
 
                     b.HasIndex("AssuntoId");
 
@@ -200,26 +204,20 @@ namespace Balcao.Infrastructure.Migrations
 
             modelBuilder.Entity("Balcao.Domain.Entities.Compra", b =>
                 {
-                    b.HasOne("Balcao.Domain.Entities.Anuncio", null)
+                    b.HasOne("Balcao.Domain.Entities.Anuncio", "Assunto")
                         .WithMany("Compras")
-                        .HasForeignKey("AnuncioId")
+                        .HasForeignKey("AssuntoId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Balcao.Domain.Entities.Anuncio", "Assunto")
-                        .WithMany()
-                        .HasForeignKey("AssuntoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Balcao.Domain.Entities.Usuario", "Autor")
-                        .WithMany()
+                        .WithMany("ComprasAutor")
                         .HasForeignKey("AutorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Balcao.Domain.Entities.Usuario", "Comprador")
-                        .WithMany("Compras")
+                        .WithMany("ComprasComprador")
                         .HasForeignKey("CompradorId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -260,7 +258,9 @@ namespace Balcao.Infrastructure.Migrations
 
             modelBuilder.Entity("Balcao.Domain.Entities.Usuario", b =>
                 {
-                    b.Navigation("Compras");
+                    b.Navigation("ComprasAutor");
+
+                    b.Navigation("ComprasComprador");
                 });
 #pragma warning restore 612, 618
         }

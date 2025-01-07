@@ -1,6 +1,6 @@
 ﻿using Balcao.Domain.Entities;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Balcao.Infrastructure.Mappings
 {
@@ -42,7 +42,11 @@ namespace Balcao.Infrastructure.Mappings
 
             #region Relationships
 
-            builder.HasMany(u => u.Compras)
+            builder.HasMany(u => u.ComprasAutor)
+                .WithOne(c => c.Autor)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasMany(u => u.ComprasComprador)
                 .WithOne(c => c.Comprador)
                 .OnDelete(DeleteBehavior.NoAction);
 

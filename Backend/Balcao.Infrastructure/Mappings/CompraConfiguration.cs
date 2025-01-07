@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Balcao.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Balcao.Domain.Entities;
 
 namespace Balcao.Infrastructure.Mappings
 {
@@ -16,24 +16,18 @@ namespace Balcao.Infrastructure.Mappings
 
             #region Properties
 
+            builder.Property(c => c.Nota)
+                .IsRequired();
+
+            builder.Property(c => c.Quantidade)
+                .IsRequired();
+
             builder.Property(c => c.Status)
                 .IsRequired()
                 .HasConversion(
                     v => v.ToString(),
                     v => (StatusCompra)Enum.Parse(typeof(StatusCompra), v))
                 .HasMaxLength(50);
-
-            #endregion
-
-            #region Relationship
-
-            builder.HasOne<Anuncio>()
-                .WithMany(a => a.Compras)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            builder.HasOne<Usuario>()
-                .WithMany(u => u.Compras)
-                .OnDelete(DeleteBehavior.NoAction);
 
             #endregion
         }

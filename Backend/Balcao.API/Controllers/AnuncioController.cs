@@ -111,7 +111,6 @@ namespace Balcao_API.Controllers
             {
                 anuncio.Quantidade = -1;
             }
-            anuncio.Ativo = anuncioDTO.Ativo;
             _anuncioRepository.Update(anuncio);
             return Ok(anuncio);
         }
@@ -135,6 +134,78 @@ namespace Balcao_API.Controllers
                 return Unauthorized();
             }
             _anuncioRepository.Delete(anuncio);
+            return Ok(anuncio);
+        }
+
+        [HttpGet]
+        [Route("{id}/Compra/{idCompra}")]
+        public IActionResult GetCompra(int id, int idCompra)
+        {
+            var anuncio = _anuncioRepository.Get(id);
+
+            if (anuncio == null)
+                return NotFound("Anúncio não encontrado!");
+
+            Compra? compra = anuncio.Compras.FirstOrDefault(c => c.Id == idCompra);
+
+            if (compra == null)
+                return NotFound();
+
+            return Ok(compra);
+        }
+
+        [HttpPost]
+        [Route("{id}/Compra")]
+        public IActionResult CreateCompra(int id, int idComprador, int quantidade)
+        {
+            var anuncio = _anuncioRepository.Get(id);
+
+            if (anuncio == null)
+                return NotFound("Anúncio não encontrado!");
+
+            Usuario comprador = _usuarioRepository.Get(idComprador);
+
+            if (comprador == null)
+                return NotFound("Usuário do comprador da compra não encontrado!");
+
+            if (comprador == anuncio.Proprietario)
+                return BadRequest("Usuário comprador não pode ser o proprietário do anúncio!");
+
+            var compra = new Compra();
+
+            compra.Autor = anuncio.Proprietario;
+            compra.Comprador = comprador;
+            compra.Quantidade = quantidade;
+            anuncio.Compras.Add(compra);
+
+            _anuncioRepository.Update(anuncio);
+
+            return CreatedAtAction(
+                nameof(GetCompra),
+                new { id = anuncio.Id, idCompra = compra.Id },
+                compra);
+        }
+
+        [HttpPatch]
+        [Route("{id}/Compra/{idCompra}/AvaliarVendedor")]
+        public IActionResult AvaliarVendedor(int id, int idCompra, float nota)
+        {
+            var anuncio = _anuncioRepository.Get(id);
+
+            if (anuncio == null)
+                return NotFound();
+
+            var compra = anuncio.Compras.FirstOrDefault(c => c.Id == idCompra);
+
+            if (compra == null)
+                return NotFound();
+
+            if (compra.Status != StatusCompra.CONCLUIDO)
+                return BadRequest("Não é possível avaliar um vendedor sem conculir a compra!");
+
+            compra.AvaliarVendedor(nota);
+
+            _anuncioRepository.Update(anuncio);
             return Ok(anuncio);
         }
     }
