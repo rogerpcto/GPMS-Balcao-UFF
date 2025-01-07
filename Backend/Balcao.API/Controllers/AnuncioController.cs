@@ -52,6 +52,35 @@ namespace Balcao_API.Controllers
             return Ok(anuncios);
         }
 
+        [HttpPost]
+        public IActionResult Create(AnuncioDTO anuncioDTO)
+        {
+            Usuario usuario = _usuarioRepository.Get(anuncioDTO.UsuarioId);
+
+            if (usuario == null)
+                return NotFound("Usuário não encontrado!");
+
+            var anuncio = new Anuncio();
+
+            anuncio.Proprietario = usuario;
+
+            anuncio.Titulo = anuncioDTO.Titulo;
+            anuncio.Descricao = anuncioDTO.Descricao;
+            anuncio.Preco = anuncioDTO.Preco;
+            if (anuncioDTO.Quantidade.HasValue)
+                anuncio.Quantidade = anuncioDTO.Quantidade.Value;
+
+            anuncio.Ativo = true;
+            anuncio.DataCriacao = DateTime.Now;
+
+            _anuncioRepository.Add(anuncio);
+
+            return CreatedAtAction(
+                nameof(Get),
+                new { id = anuncio.Id },
+                anuncio);
+        }
+
         [HttpPut]
         [Route("{id}")]
         public IActionResult Update(int id, AnuncioDTO anuncioDTO)
