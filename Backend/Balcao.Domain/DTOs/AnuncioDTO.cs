@@ -6,6 +6,5 @@
         public string Descricao { get; set; }
         public float Preco { get; set; }
         public int? Quantidade { get; set; }
-        public int UsuarioId { get; set; }
     }
 }

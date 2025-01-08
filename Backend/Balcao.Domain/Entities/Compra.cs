@@ -13,28 +13,22 @@
 
         public void AguardarPagamento()
         {
-            throw new NotImplementedException();
+            Status = StatusCompra.AGUARDANDO_PAGAMENTO;
         }
 
         public void EfetuarPagamento()
         {
-            throw new NotImplementedException();
+            Status = StatusCompra.PAGAMENTO_EFETUADO;
         }
 
         public void ConfirmarPagamento()
         {
-            throw new NotImplementedException();
+            Status = StatusCompra.PAGAMENTO_CONFIRMADO;
         }
 
         public void ConfirmarRecebimento()
         {
-            throw new NotImplementedException();
-        }
-
-        public void AvaliarComprador(float nota)
-        {
-            Comprador.Avaliar(nota);
-            Status = StatusCompra.COMPRADOR_AVALIADO;
+            Status = StatusCompra.PRODUTO_RECEBIDO;
         }
 
         public void AvaliarVendedor(float nota)
@@ -45,14 +39,21 @@
             Status = StatusCompra.VENDEDOR_AVALIADO;
         }
 
+        public void AvaliarComprador(float nota)
+        {
+            Comprador.Avaliar(nota);
+            Status = StatusCompra.COMPRADOR_AVALIADO;
+        }
+
         public void FecharCompra()
         {
-            throw new NotImplementedException();
+            Assunto.FecharCompra(Quantidade);
+            Status = StatusCompra.CONCLUIDO;
         }
 
         public void CancelarCompra()
         {
-            throw new NotImplementedException();
+            Status = StatusCompra.CANCELADO;
         }
     }
 }

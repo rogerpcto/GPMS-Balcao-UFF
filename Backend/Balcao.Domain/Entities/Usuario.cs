@@ -36,6 +36,4 @@ namespace Balcao.Domain.Entities
             Nota = ((Nota * comprasConcluidas) + nota) / (comprasConcluidas + 1);
         }
     }
-
-
 }
