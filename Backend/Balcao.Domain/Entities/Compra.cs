@@ -31,9 +31,10 @@
             throw new NotImplementedException();
         }
 
-        public void AvaliarComprador()
+        public void AvaliarComprador(float nota)
         {
-            throw new NotImplementedException();
+            Comprador.Avaliar(nota);
+            Status = StatusCompra.COMPRADOR_AVALIADO;
         }
 
         public void AvaliarVendedor(float nota)
@@ -41,6 +42,7 @@
             Nota = nota;
             Assunto.Avaliar(nota);
             Autor.Avaliar(nota);
+            Status = StatusCompra.VENDEDOR_AVALIADO;
         }
 
         public void FecharCompra()

@@ -200,10 +200,33 @@ namespace Balcao_API.Controllers
             if (compra == null)
                 return NotFound();
 
-            if (compra.Status != StatusCompra.CONCLUIDO)
-                return BadRequest("Não é possível avaliar um vendedor sem conculir a compra!");
+            if (compra.Status != StatusCompra.PRODUTO_RECEBIDO)
+                return BadRequest("Não é possível avaliar um vendedor sem receber a compra!");
 
             compra.AvaliarVendedor(nota);
+
+            _anuncioRepository.Update(anuncio);
+            return Ok(anuncio);
+        }
+
+        [HttpPatch]
+        [Route("{id}/Compra/{idCompra}/AvaliarComprador")]
+        public IActionResult AvaliarComprador(int id, int idCompra, float nota)
+        {
+            var anuncio = _anuncioRepository.Get(id);
+
+            if (anuncio == null)
+                return NotFound();
+
+            var compra = anuncio.Compras.FirstOrDefault(c => c.Id == idCompra);
+
+            if (compra == null)
+                return NotFound();
+
+            if (compra.Status != StatusCompra.VENDEDOR_AVALIADO)
+                return BadRequest("Não é possível avaliar um comprador antes de avaliar o vendedor!");
+
+            compra.AvaliarComprador(nota);
 
             _anuncioRepository.Update(anuncio);
             return Ok(anuncio);

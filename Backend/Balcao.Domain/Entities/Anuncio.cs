@@ -35,7 +35,8 @@
 
         public void Avaliar(float nota)
         {
-            Nota = ((Nota * Compras.Count) + nota) / (Compras.Count + 1);
+            int comprasConcluidas = Compras.Where(c => c.Status >= StatusCompra.VENDEDOR_AVALIADO).Count();
+            Nota = ((Nota * comprasConcluidas) + nota) / (comprasConcluidas + 1);
         }
     }
 }

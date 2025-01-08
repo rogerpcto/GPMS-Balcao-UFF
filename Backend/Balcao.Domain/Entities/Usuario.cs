@@ -32,7 +32,7 @@ namespace Balcao.Domain.Entities
 
         public void Avaliar(float nota)
         {
-            int comprasConcluidas = ComprasAutor.Where(c => c.Status == StatusCompra.CONCLUIDO).Count() + ComprasComprador.Where(c => c.Status == StatusCompra.CONCLUIDO).Count();
+            int comprasConcluidas = ComprasAutor.Where(c => c.Status >= StatusCompra.VENDEDOR_AVALIADO).Count() + ComprasComprador.Where(c => c.Status >= StatusCompra.COMPRADOR_AVALIADO).Count();
             Nota = ((Nota * comprasConcluidas) + nota) / (comprasConcluidas + 1);
         }
     }
