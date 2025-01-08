@@ -21,6 +21,7 @@ COPY ["Balcao.Domain/Balcao.Domain.csproj", "Balcao.Domain/"]
 COPY ["Balcao.Infrastructure/Balcao.Infrastructure.csproj", "Balcao.Infrastructure/"]
 RUN dotnet restore "./Balcao.API/Balcao.API.csproj"
 COPY . .
+RUN dotnet dev-certs https --trust
 WORKDIR "/src/Balcao.API"
 RUN dotnet build "./Balcao.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
