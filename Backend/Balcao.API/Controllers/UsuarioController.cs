@@ -2,7 +2,6 @@ using Balcao.Domain.DTOs;
 using Balcao.Domain.Entities;
 using Balcao.Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace Balcao_API.Controllers
 {
@@ -37,7 +36,7 @@ namespace Balcao_API.Controllers
             var usuario = _usuarioRepository.Get(id);
 
             if (usuario == null)
-                return NotFound();
+                return NotFound("Usuário não encontrado!");
 
             return Ok(usuario);
         }
@@ -63,8 +62,7 @@ namespace Balcao_API.Controllers
             var usuario = _usuarioRepository.Get(id);
 
             if (usuario == null)
-
-                return NotFound();
+                return NotFound("Usuário não encontrado!");
 
             usuario.Nome = usuarioDTO.Nome;
             usuario.Senha = usuarioDTO.Senha;
@@ -80,25 +78,20 @@ namespace Balcao_API.Controllers
             var usuario = _usuarioRepository.Get(id);
 
             if (usuario == null)
-                return NotFound();
+                return NotFound("Usuário não encontrado!");
 
             _usuarioRepository.Delete(usuario);
             return Ok(usuario);
         }
 
         [HttpPost]
-        [Route("login")]
+        [Route("Login")]
         public IActionResult Login(UsuarioDTO usuarioDTO)
         {
-            if (usuarioDTO == null)
-            {
-                return BadRequest();
-            }
-
             var usuario = _usuarioRepository.Query().FirstOrDefault(x => x.Email == usuarioDTO.Email);
             if (usuario == null)
             {
-                return NotFound();
+                return NotFound("Usuário não encontrado!");
             }
 
             if (!usuario.Logar(usuarioDTO.Senha))
@@ -110,21 +103,19 @@ namespace Balcao_API.Controllers
         }
 
         [HttpPost]
-        [Route("{id}/criarAnuncio")]
+        [Route("{id}/CriarAnuncio")]
         public IActionResult Create(int id, AnuncioDTO anuncioDTO)
         {
             var usuario = _usuarioRepository.Get(id);
             if (usuario == null)
-            {
-                return NotFound();
-            }
+                return NotFound("Usuário não encontrado!");
+
             Anuncio anuncio = new Anuncio();
             anuncio.Proprietario = usuario;
             anuncio.Titulo = anuncioDTO.Titulo;
-            anuncio.Ativo = anuncioDTO.Ativo;
             anuncio.Descricao = anuncioDTO.Descricao;
             anuncio.Preco = anuncioDTO.Preco;
-            if (anuncioDTO.Quantidade != null && anuncioDTO.Quantidade >= 0)
+            if (anuncioDTO.Quantidade.HasValue && anuncioDTO.Quantidade >= 0)
             {
                 anuncio.Quantidade = anuncioDTO.Quantidade.Value;
             }
@@ -132,12 +123,14 @@ namespace Balcao_API.Controllers
             {
                 anuncio.Quantidade = -1;
             }
-            //Precisamos receber um boolean do front, perguntando se o tipo do An�ncio � Servi�o ou Produto.
-            //Se for Servi�o, set quantidade < 1. Se for Produto, set quantidade = quantidade recebida
+
+            anuncio.Ativo = true;
             DateTime dateTime = DateTime.UtcNow;
             TimeZoneInfo horaBrasilia = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
             anuncio.DataCriacao = TimeZoneInfo.ConvertTimeFromUtc(dateTime, horaBrasilia);
+
             _anuncioRepository.Add(anuncio);
+
             return CreatedAtAction(
                 nameof(Get),
                 new { id = anuncio.Id },

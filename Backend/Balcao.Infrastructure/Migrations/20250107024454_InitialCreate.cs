@@ -59,32 +59,26 @@ namespace Balcao.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Quantidade = table.Column<int>(type: "int", nullable: false),
+                    Nota = table.Column<float>(type: "real", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CompradorId = table.Column<int>(type: "int", nullable: false),
                     AutorId = table.Column<int>(type: "int", nullable: false),
-                    AssuntoId = table.Column<int>(type: "int", nullable: false),
-                    AnuncioId = table.Column<int>(type: "int", nullable: false)
+                    AssuntoId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Compras", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Compras_Anuncios_AnuncioId",
-                        column: x => x.AnuncioId,
-                        principalTable: "Anuncios",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Compras_Anuncios_AssuntoId",
                         column: x => x.AssuntoId,
                         principalTable: "Anuncios",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Compras_Usuarios_AutorId",
                         column: x => x.AutorId,
                         principalTable: "Usuarios",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Compras_Usuarios_CompradorId",
                         column: x => x.CompradorId,
@@ -136,11 +130,6 @@ namespace Balcao.Infrastructure.Migrations
                 name: "IX_Anuncios_ProprietarioId",
                 table: "Anuncios",
                 column: "ProprietarioId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Compras_AnuncioId",
-                table: "Compras",
-                column: "AnuncioId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Compras_AssuntoId",

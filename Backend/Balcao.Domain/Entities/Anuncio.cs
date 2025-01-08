@@ -28,9 +28,28 @@
             Ativo = false;
         }
 
-        public Compra IniciarCompra(Usuario comprador)
+        public Compra IniciarCompra(Usuario comprador, int quantidade)
         {
-            throw new NotImplementedException();
+            var compra = new Compra();
+
+            compra.Autor = Proprietario;
+            compra.Comprador = comprador;
+            compra.Quantidade = quantidade;
+            Compras.Add(compra);
+
+            return compra;
+        }
+
+        public void Avaliar(float nota)
+        {
+            int comprasConcluidas = Compras.Where(c => c.Status >= StatusCompra.VENDEDOR_AVALIADO).Count();
+            Nota = ((Nota * comprasConcluidas) + nota) / (comprasConcluidas + 1);
+        }
+
+        public void FecharCompra(int quantidade)
+        {
+            if (!EhServico())
+                Quantidade -= quantidade;
         }
     }
 }

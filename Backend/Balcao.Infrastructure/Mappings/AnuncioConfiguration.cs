@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Balcao.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Balcao.Domain.Entities;
 
 namespace Balcao.Infrastructure.Mappings
 {
@@ -52,7 +52,7 @@ namespace Balcao.Infrastructure.Mappings
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(a => a.Compras)
-                .WithOne()
+                .WithOne(c => c.Assunto)
                 .OnDelete(DeleteBehavior.NoAction);
 
             #endregion

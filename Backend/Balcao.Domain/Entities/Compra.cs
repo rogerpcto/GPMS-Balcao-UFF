@@ -3,7 +3,9 @@
     public class Compra
     {
         public int Id { get; set; }
-        public StatusCompra Status { get; set; }
+        public int Quantidade { get; set; }
+        public float Nota { get; set; } = -1;
+        public StatusCompra Status { get; set; } = StatusCompra.NEGOCIANDO;
         public virtual Usuario Comprador { get; set; }
         public virtual Usuario Autor { get; set; }
         public virtual Anuncio Assunto { get; set; }
@@ -11,42 +13,47 @@
 
         public void AguardarPagamento()
         {
-            throw new NotImplementedException();
+            Status = StatusCompra.AGUARDANDO_PAGAMENTO;
         }
 
         public void EfetuarPagamento()
         {
-            throw new NotImplementedException();
+            Status = StatusCompra.PAGAMENTO_EFETUADO;
         }
 
         public void ConfirmarPagamento()
         {
-            throw new NotImplementedException();
+            Status = StatusCompra.PAGAMENTO_CONFIRMADO;
         }
 
         public void ConfirmarRecebimento()
         {
-            throw new NotImplementedException();
+            Status = StatusCompra.PRODUTO_RECEBIDO;
         }
 
-        public void AvaliarComprador()
+        public void AvaliarVendedor(float nota)
         {
-            throw new NotImplementedException();
+            Nota = nota;
+            Assunto.Avaliar(nota);
+            Autor.Avaliar(nota);
+            Status = StatusCompra.VENDEDOR_AVALIADO;
         }
 
-        public void AvaliarVendedor()
+        public void AvaliarComprador(float nota)
         {
-            throw new NotImplementedException();
+            Comprador.Avaliar(nota);
+            Status = StatusCompra.COMPRADOR_AVALIADO;
         }
 
         public void FecharCompra()
         {
-            throw new NotImplementedException();
+            Assunto.FecharCompra(Quantidade);
+            Status = StatusCompra.CONCLUIDO;
         }
 
         public void CancelarCompra()
         {
-            throw new NotImplementedException();
+            Status = StatusCompra.CANCELADO;
         }
     }
 }
