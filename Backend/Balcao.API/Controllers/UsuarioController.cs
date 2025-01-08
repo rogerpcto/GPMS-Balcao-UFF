@@ -3,7 +3,7 @@ using Balcao.Domain.Entities;
 using Balcao.Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Balcao_API.Controllers
+namespace Balcao.API.Controllers
 {
     [ApiController]
     [Route("[controller]s")]
