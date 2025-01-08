@@ -21,10 +21,33 @@ namespace Balcao_API.Controllers
         }
 
         [HttpGet]
-        public IActionResult List()
+        public IActionResult List(string? consulta, DateTime? dataMinima, DateTime? dataMaxima, float? precoMinimo, float? precoMaximo)
         {
-            var anuncios = _anuncioRepository.Query().Where(anuncio => anuncio.Ativo == true).ToList();
-            return Ok(anuncios);
+            var anuncios = _anuncioRepository.Query().Where(anuncio => anuncio.Ativo == true);
+
+            if (dataMinima.HasValue)
+            {
+                anuncios = anuncios.Where(anuncio => anuncio.DataCriacao >= dataMinima);
+            }
+            if (dataMaxima.HasValue)
+            {
+                anuncios = anuncios.Where(anuncio => anuncio.DataCriacao <= dataMaxima);
+            }
+            if (precoMinimo.HasValue)
+            {
+                anuncios = anuncios.Where(anuncio => anuncio.Preco >= precoMinimo);
+            }
+            if (precoMaximo.HasValue)
+            {
+                anuncios = anuncios.Where(anuncio => anuncio.Preco <= precoMaximo);
+            }
+            if (!string.IsNullOrEmpty(consulta))
+            {
+                var termos = consulta.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                anuncios = anuncios.Where(anuncio => termos.Any(termo => anuncio.Titulo.ToLower().Contains(termo) || anuncio.Descricao.ToLower().Contains(termo)));
+            }
+
+            return Ok(anuncios.ToList());
         }
 
         [HttpGet]
