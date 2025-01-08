@@ -59,7 +59,7 @@ namespace Balcao_API.Controllers
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
-                return NotFound();
+                return NotFound("Anúncio não encontrado!");
 
             return Ok(anuncio);
         }
@@ -71,7 +71,7 @@ namespace Balcao_API.Controllers
             var usuario = _usuarioRepository.Get(idUsuario);
             if (usuario == null)
             {
-                return NotFound();
+                return NotFound("Usuário não encontrado!");
             }
             var anuncios = _anuncioRepository.Query().Where(anuncio => anuncio.Proprietario.Id == idUsuario).ToList();
             return Ok(anuncios);
@@ -84,7 +84,7 @@ namespace Balcao_API.Controllers
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
-                return NotFound();
+                return NotFound("Anúncio não encontrado!");
 
             var usuario = _usuarioRepository.Get(usuarioId);
             if (usuario == null)
@@ -118,7 +118,7 @@ namespace Balcao_API.Controllers
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
-                return NotFound();
+                return NotFound("Anúncio não encontrado!");
 
             var usuario = _usuarioRepository.Get(usuarioId);
             if (usuario == null)
@@ -149,7 +149,7 @@ namespace Balcao_API.Controllers
             Compra? compra = anuncio.Compras.FirstOrDefault(c => c.Id == idCompra);
 
             if (compra == null)
-                return NotFound();
+                return NotFound("Compra não encontrada!");
 
             return Ok(compra);
         }
@@ -188,12 +188,12 @@ namespace Balcao_API.Controllers
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
-                return NotFound();
+                return NotFound("Anúncio não encontrado!");
 
             var compra = anuncio.Compras.FirstOrDefault(c => c.Id == idCompra);
 
             if (compra == null)
-                return NotFound();
+                return NotFound("Compra não encontrada!");
 
             if (compra.Status != StatusCompra.NEGOCIANDO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.NEGOCIANDO}!");
@@ -211,12 +211,12 @@ namespace Balcao_API.Controllers
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
-                return NotFound();
+                return NotFound("Anúncio não encontrado!");
 
             var compra = anuncio.Compras.FirstOrDefault(c => c.Id == idCompra);
 
             if (compra == null)
-                return NotFound();
+                return NotFound("Compra não encontrada!");
 
             if (compra.Status != StatusCompra.AGUARDANDO_PAGAMENTO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.AGUARDANDO_PAGAMENTO}!");
@@ -234,12 +234,12 @@ namespace Balcao_API.Controllers
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
-                return NotFound();
+                return NotFound("Anúncio não encontrado!");
 
             var compra = anuncio.Compras.FirstOrDefault(c => c.Id == idCompra);
 
             if (compra == null)
-                return NotFound();
+                return NotFound("Compra não encontrada!");
 
             if (compra.Status != StatusCompra.PAGAMENTO_EFETUADO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.PAGAMENTO_EFETUADO}!");
@@ -257,12 +257,12 @@ namespace Balcao_API.Controllers
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
-                return NotFound();
+                return NotFound("Anúncio não encontrado!");
 
             var compra = anuncio.Compras.FirstOrDefault(c => c.Id == idCompra);
 
             if (compra == null)
-                return NotFound();
+                return NotFound("Compra não encontrada!");
 
             if (compra.Status != StatusCompra.PAGAMENTO_CONFIRMADO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.PAGAMENTO_CONFIRMADO}!");
@@ -280,12 +280,12 @@ namespace Balcao_API.Controllers
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
-                return NotFound();
+                return NotFound("Anúncio não encontrado!");
 
             var compra = anuncio.Compras.FirstOrDefault(c => c.Id == idCompra);
 
             if (compra == null)
-                return NotFound();
+                return NotFound("Compra não encontrada!");
 
             if (compra.Status != StatusCompra.PRODUTO_RECEBIDO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.PRODUTO_RECEBIDO}!");
@@ -303,12 +303,12 @@ namespace Balcao_API.Controllers
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
-                return NotFound();
+                return NotFound("Anúncio não encontrado!");
 
             var compra = anuncio.Compras.FirstOrDefault(c => c.Id == idCompra);
 
             if (compra == null)
-                return NotFound();
+                return NotFound("Compra não encontrada!");
 
             if (compra.Status != StatusCompra.VENDEDOR_AVALIADO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.VENDEDOR_AVALIADO}!");
@@ -326,12 +326,12 @@ namespace Balcao_API.Controllers
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
-                return NotFound();
+                return NotFound("Anúncio não encontrado!");
 
             var compra = anuncio.Compras.FirstOrDefault(c => c.Id == idCompra);
 
             if (compra == null)
-                return NotFound();
+                return NotFound("Compra não encontrada!");
 
             if (compra.Status != StatusCompra.COMPRADOR_AVALIADO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.COMPRADOR_AVALIADO}!");
@@ -349,12 +349,12 @@ namespace Balcao_API.Controllers
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
-                return NotFound();
+                return NotFound("Anúncio não encontrado!");
 
             var compra = anuncio.Compras.FirstOrDefault(c => c.Id == idCompra);
 
             if (compra == null)
-                return NotFound();
+                return NotFound("Compra não encontrada!");
 
             compra.CancelarCompra();
 
