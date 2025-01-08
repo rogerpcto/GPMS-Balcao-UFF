@@ -1,6 +1,8 @@
+using Balcao.API.Services;
 using Balcao.Domain.DTOs;
 using Balcao.Domain.Entities;
 using Balcao.Domain.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Balcao.API.Controllers
@@ -21,15 +23,15 @@ namespace Balcao.API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult List()
         {
-            // Exemplo do uso de LINQ
-            //var usuarioLogan = _usuarioRepository.Query().Where(usuario => usuario.Nome == "Logan");
             var usuarios = _usuarioRepository.Query().ToList();
             return Ok(usuarios);
         }
 
         [HttpGet]
+        [Authorize]
         [Route("{id}")]
         public IActionResult Get(int id)
         {
@@ -56,6 +58,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         [Route("{id}")]
         public IActionResult Update(int id, UsuarioDTO usuarioDTO)
         {
@@ -72,6 +75,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpDelete]
+        [Authorize]
         [Route("{id}")]
         public IActionResult Delete(int id)
         {
@@ -86,23 +90,22 @@ namespace Balcao.API.Controllers
 
         [HttpPost]
         [Route("Login")]
-        public IActionResult Login(UsuarioDTO usuarioDTO)
+        public IActionResult Login(string email, string senha)
         {
-            var usuario = _usuarioRepository.Query().FirstOrDefault(x => x.Email == usuarioDTO.Email);
-            if (usuario == null)
+            var usuario = _usuarioRepository.Query().FirstOrDefault(x => x.Email == email);
+
+            if (usuario == null || !usuario.Logar(senha))
             {
-                return NotFound("Usuário não encontrado!");
+                return Unauthorized("Login ou senha incorretos!");
             }
 
-            if (!usuario.Logar(usuarioDTO.Senha))
-            {
-                return Unauthorized();
-            }
+            var token = TokenService.GenerateToken(usuario);
 
-            return Ok(usuario);
+            return Ok(new { message = "Login bem-sucedido", token });
         }
 
         [HttpPost]
+        [Authorize]
         [Route("{id}/CriarAnuncio")]
         public IActionResult Create(int id, AnuncioDTO anuncioDTO)
         {

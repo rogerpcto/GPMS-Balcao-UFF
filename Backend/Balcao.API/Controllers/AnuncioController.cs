@@ -1,10 +1,12 @@
 ﻿using Balcao.Domain.DTOs;
 using Balcao.Domain.Entities;
 using Balcao.Domain.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Balcao.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]s")]
     public class AnuncioController : ControllerBase
