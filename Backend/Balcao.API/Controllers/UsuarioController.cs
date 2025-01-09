@@ -71,7 +71,7 @@ namespace Balcao.API.Controllers
         [Route("CriarAdmin")]
         public IActionResult CriarAdmin(UsuarioDTO usuarioDTO)
         {
-            if (!TokenService.EhAdmin(User))
+            if (!TokenService.EhAdmin(User) && _usuarioRepository.Query().Any(u => u.Perfil == Perfil.ADMINISTRADOR))
                 return Unauthorized("Apenas administradores podem criar usuários administradores!");
 
             if (string.IsNullOrEmpty(usuarioDTO.Nome) || string.IsNullOrEmpty(usuarioDTO.Email) || string.IsNullOrEmpty(usuarioDTO.Senha))
