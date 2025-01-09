@@ -23,7 +23,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [AllowAnonymous]
         public IActionResult List()
         {
             var usuarios = _usuarioRepository.Query().ToList();
@@ -31,7 +31,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [AllowAnonymous]
         [Route("{id}")]
         public IActionResult Get(int id)
         {
@@ -44,6 +44,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult Create(UsuarioDTO usuarioDTO)
         {
             if (string.IsNullOrEmpty(usuarioDTO.Nome) || string.IsNullOrEmpty(usuarioDTO.Email) || string.IsNullOrEmpty(usuarioDTO.Senha))
@@ -143,6 +144,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [Route("Login")]
         public IActionResult Login(string email, string senha)
         {
@@ -198,6 +200,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("{idUsuario}/ListarAnuncios")]
         public IActionResult GetAnuncios(int idUsuario)
         {
@@ -208,6 +211,23 @@ namespace Balcao.API.Controllers
             }
             var anuncios = _anuncioRepository.Query().Where(anuncio => anuncio.Proprietario.Id == idUsuario).ToList();
             return Ok(anuncios);
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("{idUsuario}/ListarCompras")]
+        public IActionResult GetCompras(int idUsuario)
+        {
+            var usuario = _usuarioRepository.Get(idUsuario);
+            if (usuario == null)
+            {
+                return NotFound("Usuário não encontrado!");
+            }
+
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(usuario, User))
+                return Unauthorized("Você não tem permissão para ver as compras deste usuário!");
+
+            return Ok(usuario.Compras);
         }
     }
 }

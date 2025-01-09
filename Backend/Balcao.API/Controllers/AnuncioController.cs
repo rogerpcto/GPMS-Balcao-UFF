@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Balcao.API.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]s")]
     public class AnuncioController : ControllerBase
@@ -26,6 +25,7 @@ namespace Balcao.API.Controllers
         #region Anúncio
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult List(string? consulta, DateTime? dataMinima, DateTime? dataMaxima, float? precoMinimo, float? precoMaximo)
         {
             var anuncios = _anuncioRepository.Query().Where(anuncio => anuncio.Ativo == true);
@@ -56,6 +56,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("{id}")]
         public IActionResult Get(int id)
         {
@@ -67,7 +68,24 @@ namespace Balcao.API.Controllers
             return Ok(anuncio);
         }
 
+        [HttpGet]
+        [Authorize]
+        [Route("{id}/Compras")]
+        public IActionResult GetCompras(int id)
+        {
+            var anuncio = _anuncioRepository.Get(id);
+
+            if (anuncio == null)
+                return NotFound("Anúncio não encontrado!");
+
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(anuncio.Proprietario, User))
+                return Unauthorized("Você não tem permissão para ver as compras deste anúncio!");
+
+            return Ok(anuncio.Compras);
+        }
+
         [HttpPut]
+        [Authorize]
         [Route("{id}")]
         public IActionResult Update(int id, AnuncioDTO anuncioDTO)
         {
@@ -95,6 +113,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Desativar")]
         public IActionResult Desativar(int id, AnuncioDTO anuncioDTO)
         {
@@ -117,6 +136,7 @@ namespace Balcao.API.Controllers
         #region Compra
 
         [HttpGet]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}")]
         public IActionResult GetCompra(int id, int idCompra)
         {
@@ -137,6 +157,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [Route("{id}/Compra")]
         public IActionResult CreateCompra(int id, int idComprador, int quantidade)
         {
@@ -164,6 +185,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/AguardarPagamento")]
         public IActionResult AguardarPagamento(int id, int idCompra)
         {
@@ -190,6 +212,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/EfetuarPagamento")]
         public IActionResult EfetuarPagamento(int id, int idCompra)
         {
@@ -216,6 +239,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/ConfirmarPagamento")]
         public IActionResult ConfirmarPagamento(int id, int idCompra)
         {
@@ -242,6 +266,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/ConfirmarRecebimento")]
         public IActionResult ConfirmarRecebimento(int id, int idCompra)
         {
@@ -268,6 +293,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/AvaliarVendedor")]
         public IActionResult AvaliarVendedor(int id, int idCompra, float nota)
         {
@@ -294,6 +320,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/AvaliarComprador")]
         public IActionResult AvaliarComprador(int id, int idCompra, float nota)
         {
@@ -320,6 +347,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/Concluir")]
         public IActionResult Concluir(int id, int idCompra)
         {
@@ -346,6 +374,7 @@ namespace Balcao.API.Controllers
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/Cancelar")]
         public IActionResult Cancelar(int id, int idCompra)
         {

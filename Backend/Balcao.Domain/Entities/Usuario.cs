@@ -11,6 +11,7 @@ namespace Balcao.Domain.Entities
         public string Senha { get; set; }
         public float Nota { get; set; }
         public virtual Perfil Perfil { get; set; }
+        [JsonIgnore]
         public virtual List<Compra> Compras { get; set; } = new List<Compra>();
 
         public bool Logar(string requisicaoSenha)

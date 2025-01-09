@@ -1,4 +1,6 @@
-﻿namespace Balcao.Domain.Entities
+﻿using System.Text.Json.Serialization;
+
+namespace Balcao.Domain.Entities
 {
     public class Anuncio
     {
@@ -12,6 +14,7 @@
         public int Quantidade { get; set; }
         public virtual Usuario Proprietario { get; set; }
         public virtual List<Imagem> Imagem { get; set; } = new List<Imagem>();
+        [JsonIgnore]
         public virtual List<Compra> Compras { get; set; } = new List<Compra>();
 
         public bool EhServico()
