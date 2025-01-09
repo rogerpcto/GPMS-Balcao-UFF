@@ -37,6 +37,8 @@ namespace Balcao.API.Services
         public static bool EhAdmin(ClaimsPrincipal usuarioAtual) => usuarioAtual.Claims.First(c => c.Type == ClaimTypes.Role).Value == Perfil.ADMINISTRADOR.ToString();
 
         public static bool EhProprietario(Usuario usuarioProprietario, ClaimsPrincipal usuarioAtual) => usuarioAtual.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value == usuarioProprietario.Id.ToString();
+
+        public static int GetIdUsuario(ClaimsPrincipal usuarioAtual) => int.Parse(usuarioAtual.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value);
     }
     public class SecurityRequirementOperationFilter : IOperationFilter
     {

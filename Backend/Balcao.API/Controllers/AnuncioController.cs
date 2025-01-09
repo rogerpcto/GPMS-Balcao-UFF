@@ -84,6 +84,46 @@ namespace Balcao.API.Controllers
             return Ok(anuncio.Compras);
         }
 
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult Create(AnuncioDTO anuncioDTO)
+        {
+            int idUsuario = TokenService.GetIdUsuario(User);
+            var usuario = _usuarioRepository.Get(idUsuario);
+            if (usuario == null)
+                return NotFound("Usuário não encontrado!");
+
+            if (!TokenService.EhProprietario(usuario, User))
+                return Unauthorized("Você não tem permissão para criar anúncios para esse usuário!");
+
+            Anuncio anuncio = new Anuncio();
+            anuncio.Proprietario = usuario;
+            anuncio.Titulo = anuncioDTO.Titulo;
+            anuncio.Descricao = anuncioDTO.Descricao;
+            anuncio.Preco = anuncioDTO.Preco;
+            if (anuncioDTO.Quantidade.HasValue && anuncioDTO.Quantidade >= 0)
+            {
+                anuncio.Quantidade = anuncioDTO.Quantidade.Value;
+            }
+            else
+            {
+                anuncio.Quantidade = -1;
+            }
+
+            anuncio.Ativo = true;
+            DateTime dateTime = DateTime.UtcNow;
+            TimeZoneInfo horaBrasilia = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+            anuncio.DataCriacao = TimeZoneInfo.ConvertTimeFromUtc(dateTime, horaBrasilia);
+
+            _anuncioRepository.Add(anuncio);
+
+            return CreatedAtAction(
+                nameof(Get),
+                new { id = anuncio.Id },
+                anuncio);
+        }
+
         [HttpPut]
         [Authorize]
         [Route("{id}")]
@@ -154,6 +194,24 @@ namespace Balcao.API.Controllers
                 return Unauthorized("Você não tem permissão para acessar esta compra!");
 
             return Ok(compra);
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("ListarCompras")]
+        public IActionResult GetCompras()
+        {
+            int idUsuario = TokenService.GetIdUsuario(User);
+            var usuario = _usuarioRepository.Get(idUsuario);
+            if (usuario == null)
+            {
+                return NotFound("Usuário não encontrado!");
+            }
+
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(usuario, User))
+                return Unauthorized("Você não tem permissão para ver as compras deste usuário!");
+
+            return Ok(usuario.Compras);
         }
 
         [HttpPost]
