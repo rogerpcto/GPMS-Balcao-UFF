@@ -46,10 +46,44 @@ namespace Balcao.API.Controllers
         [HttpPost]
         public IActionResult Create(UsuarioDTO usuarioDTO)
         {
+            if (string.IsNullOrEmpty(usuarioDTO.Nome) || string.IsNullOrEmpty(usuarioDTO.Email) || string.IsNullOrEmpty(usuarioDTO.Senha))
+            {
+                return BadRequest("Nome, e-mail e senha são obrigatórios!");
+            }
+
+            if (_usuarioRepository.Query().Any(u => u.Email.ToLower() == usuarioDTO.Email.ToLower()))
+                return BadRequest("Já existe um usuário com esse e-mail!");
+
             Usuario usuario = new Usuario();
             usuario.Nome = usuarioDTO.Nome;
             usuario.Senha = Usuario.Criptografar(usuarioDTO.Senha);
-            usuario.Email = usuarioDTO.Email;
+            usuario.Email = usuarioDTO.Email.ToLower();
+            usuario.Perfil = Perfil.USUARIO;
+            _usuarioRepository.Add(usuario);
+            return CreatedAtAction(
+                nameof(Get),
+                new { id = usuario.Id },
+                usuario);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("CriarAdmin")]
+        public IActionResult CriarAdmin(UsuarioDTO usuarioDTO)
+        {
+            if (!TokenService.EhAdmin(User))
+                return Unauthorized("Apenas administradores podem criar usuários administradores!");
+
+            if (string.IsNullOrEmpty(usuarioDTO.Nome) || string.IsNullOrEmpty(usuarioDTO.Email) || string.IsNullOrEmpty(usuarioDTO.Senha))
+            {
+                return BadRequest("Nome, e-mail e senha são obrigatórios!");
+            }
+
+            Usuario usuario = new Usuario();
+            usuario.Nome = usuarioDTO.Nome;
+            usuario.Senha = Usuario.Criptografar(usuarioDTO.Senha);
+            usuario.Email = usuarioDTO.Email.ToLower();
+            usuario.Perfil = Perfil.ADMINISTRADOR;
             _usuarioRepository.Add(usuario);
             return CreatedAtAction(
                 nameof(Get),
@@ -67,9 +101,18 @@ namespace Balcao.API.Controllers
             if (usuario == null)
                 return NotFound("Usuário não encontrado!");
 
-            usuario.Nome = usuarioDTO.Nome;
-            usuario.Senha = usuarioDTO.Senha;
-            usuario.Email = usuarioDTO.Email;
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(usuario, User))
+                return Unauthorized("Você não tem permissão para alterar este usuário!");
+
+            if (string.IsNullOrEmpty(usuarioDTO.Nome))
+                usuario.Nome = usuarioDTO.Nome;
+
+            if (string.IsNullOrEmpty(usuarioDTO.Senha))
+                usuario.Senha = usuarioDTO.Senha;
+
+            if (string.IsNullOrEmpty(usuarioDTO.Email))
+                usuario.Email = usuarioDTO.Email.ToLower();
+
             _usuarioRepository.Update(usuario);
             return Ok(usuario);
         }
@@ -84,7 +127,18 @@ namespace Balcao.API.Controllers
             if (usuario == null)
                 return NotFound("Usuário não encontrado!");
 
-            _usuarioRepository.Delete(usuario);
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(usuario, User))
+                return Unauthorized("Você não tem permissão para apagar este usuário!");
+
+            try
+            {
+                _usuarioRepository.Delete(usuario);
+            }
+            catch
+            {
+                return BadRequest("Usuário não pode ser apagado por ter participado em anúncios.");
+            }
+
             return Ok(usuario);
         }
 
@@ -106,12 +160,15 @@ namespace Balcao.API.Controllers
 
         [HttpPost]
         [Authorize]
-        [Route("{id}/CriarAnuncio")]
-        public IActionResult Create(int id, AnuncioDTO anuncioDTO)
+        [Route("{idUsuario}/CriarAnuncio")]
+        public IActionResult Create(int idUsuario, AnuncioDTO anuncioDTO)
         {
-            var usuario = _usuarioRepository.Get(id);
+            var usuario = _usuarioRepository.Get(idUsuario);
             if (usuario == null)
                 return NotFound("Usuário não encontrado!");
+
+            if (!TokenService.EhProprietario(usuario, User))
+                return Unauthorized("Você não tem permissão para criar anúncios para esse usuário!");
 
             Anuncio anuncio = new Anuncio();
             anuncio.Proprietario = usuario;
@@ -138,6 +195,19 @@ namespace Balcao.API.Controllers
                 nameof(Get),
                 new { id = anuncio.Id },
                 anuncio);
+        }
+
+        [HttpGet]
+        [Route("{idUsuario}/ListarAnuncios")]
+        public IActionResult GetAnuncios(int idUsuario)
+        {
+            var usuario = _usuarioRepository.Get(idUsuario);
+            if (usuario == null)
+            {
+                return NotFound("Usuário não encontrado!");
+            }
+            var anuncios = _anuncioRepository.Query().Where(anuncio => anuncio.Proprietario.Id == idUsuario).ToList();
+            return Ok(anuncios);
         }
     }
 }

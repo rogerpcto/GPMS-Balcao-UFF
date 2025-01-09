@@ -30,5 +30,9 @@ namespace Balcao.API.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+        public static bool EhAdmin(ClaimsPrincipal usuarioAtual) => usuarioAtual.Claims.First(c => c.Type == ClaimTypes.Role).Value == Perfil.ADMINISTRADOR.ToString();
+
+        public static bool EhProprietario(Usuario usuarioProprietario, ClaimsPrincipal usuarioAtual) => usuarioAtual.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value == usuarioProprietario.Id.ToString();
     }
 }
