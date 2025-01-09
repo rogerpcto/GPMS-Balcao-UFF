@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Balcao.Domain.Entities
+﻿namespace Balcao.Domain.Entities
 {
     public class Anuncio
     {
@@ -14,7 +12,6 @@ namespace Balcao.Domain.Entities
         public int Quantidade { get; set; }
         public virtual Usuario Proprietario { get; set; }
         public virtual List<Imagem> Imagem { get; set; } = new List<Imagem>();
-        [JsonIgnore]
         public virtual List<Compra> Compras { get; set; } = new List<Compra>();
 
         public bool EhServico()
@@ -53,6 +50,23 @@ namespace Balcao.Domain.Entities
         {
             if (!EhServico())
                 Quantidade -= quantidade;
+        }
+
+        public object ToJson()
+        {
+            return new
+            {
+                Id,
+                Titulo,
+                Descricao,
+                Ativo,
+                Nota,
+                DataCriacao,
+                Preco,
+                Quantidade,
+                Proprietario = Proprietario.ToJson(),
+                Imagem,
+            };
         }
     }
 }

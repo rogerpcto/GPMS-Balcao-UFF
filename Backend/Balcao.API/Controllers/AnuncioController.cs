@@ -52,7 +52,7 @@ namespace Balcao.API.Controllers
                 anuncios = anuncios.Where(anuncio => termos.Any(termo => anuncio.Titulo.ToLower().Contains(termo) || anuncio.Descricao.ToLower().Contains(termo)));
             }
 
-            return Ok(anuncios.ToList());
+            return Ok(anuncios.Select(u => u.ToJson()).ToList());
         }
 
         [HttpGet]
@@ -65,7 +65,7 @@ namespace Balcao.API.Controllers
             if (anuncio == null)
                 return NotFound("Anúncio não encontrado!");
 
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpGet]
@@ -81,7 +81,7 @@ namespace Balcao.API.Controllers
             if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(anuncio.Proprietario, User))
                 return Unauthorized("Você não tem permissão para ver as compras deste anúncio!");
 
-            return Ok(anuncio.Compras);
+            return Ok(anuncio.Compras.Select(c => c.ToJson()));
         }
 
 
@@ -121,7 +121,7 @@ namespace Balcao.API.Controllers
             return CreatedAtAction(
                 nameof(Get),
                 new { id = anuncio.Id },
-                anuncio);
+                anuncio.ToJson());
         }
 
         [HttpPut]
@@ -149,7 +149,7 @@ namespace Balcao.API.Controllers
                 anuncio.Quantidade = -1;
             }
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
@@ -168,7 +168,7 @@ namespace Balcao.API.Controllers
                 return Unauthorized("Você não tem permissão para desativar este anúncio!");
 
             _anuncioRepository.Delete(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         #endregion
@@ -193,7 +193,7 @@ namespace Balcao.API.Controllers
             if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(anuncio.Proprietario, User) && !TokenService.EhProprietario(compra.Comprador, User))
                 return Unauthorized("Você não tem permissão para acessar esta compra!");
 
-            return Ok(compra);
+            return Ok(compra.ToJson());
         }
 
         [HttpGet]
@@ -211,14 +211,16 @@ namespace Balcao.API.Controllers
             if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(usuario, User))
                 return Unauthorized("Você não tem permissão para ver as compras deste usuário!");
 
-            return Ok(usuario.Compras);
+            return Ok(usuario.Compras.Select(c => c.ToJson()));
         }
 
         [HttpPost]
         [Authorize]
         [Route("{id}/Compra")]
-        public IActionResult CreateCompra(int id, int idComprador, int quantidade)
+        public IActionResult CreateCompra(int id, int quantidade)
         {
+            int idComprador = TokenService.GetIdUsuario(User);
+
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
@@ -239,7 +241,7 @@ namespace Balcao.API.Controllers
             return CreatedAtAction(
                 nameof(GetCompra),
                 new { id = anuncio.Id, idCompra = compra.Id },
-                compra);
+                compra.ToJson());
         }
 
         [HttpPatch]
@@ -266,7 +268,7 @@ namespace Balcao.API.Controllers
             compra.AguardarPagamento();
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
@@ -293,7 +295,7 @@ namespace Balcao.API.Controllers
             compra.EfetuarPagamento();
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
@@ -320,7 +322,7 @@ namespace Balcao.API.Controllers
             compra.ConfirmarPagamento();
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
@@ -347,7 +349,7 @@ namespace Balcao.API.Controllers
             compra.ConfirmarRecebimento();
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
@@ -374,7 +376,7 @@ namespace Balcao.API.Controllers
             compra.AvaliarVendedor(nota);
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
@@ -401,7 +403,7 @@ namespace Balcao.API.Controllers
             compra.AvaliarComprador(nota);
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
@@ -428,7 +430,7 @@ namespace Balcao.API.Controllers
             compra.FecharCompra();
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
@@ -452,7 +454,7 @@ namespace Balcao.API.Controllers
             compra.CancelarCompra();
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         #endregion

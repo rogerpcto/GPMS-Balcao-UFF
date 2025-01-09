@@ -27,7 +27,7 @@ namespace Balcao.API.Controllers
         public IActionResult List()
         {
             var usuarios = _usuarioRepository.Query().ToList();
-            return Ok(usuarios);
+            return Ok(usuarios.Select(u => u.ToJson()));
         }
 
         [HttpGet]
@@ -40,7 +40,7 @@ namespace Balcao.API.Controllers
             if (usuario == null)
                 return NotFound("Usuário não encontrado!");
 
-            return Ok(usuario);
+            return Ok(usuario.ToJson());
         }
 
         [HttpPost]
@@ -64,7 +64,7 @@ namespace Balcao.API.Controllers
             return CreatedAtAction(
                 nameof(Get),
                 new { id = usuario.Id },
-                usuario);
+                usuario.ToJson());
         }
 
         [HttpPost]
@@ -89,7 +89,7 @@ namespace Balcao.API.Controllers
             return CreatedAtAction(
                 nameof(Get),
                 new { id = usuario.Id },
-                usuario);
+                usuario.ToJson());
         }
 
         [HttpPut]
@@ -115,7 +115,7 @@ namespace Balcao.API.Controllers
                 usuario.Email = usuarioDTO.Email.ToLower();
 
             _usuarioRepository.Update(usuario);
-            return Ok(usuario);
+            return Ok(usuario.ToJson());
         }
 
         [HttpDelete]
@@ -140,7 +140,7 @@ namespace Balcao.API.Controllers
                 return BadRequest("Usuário não pode ser apagado por ter participado em anúncios.");
             }
 
-            return Ok(usuario);
+            return Ok(usuario.ToJson());
         }
 
         [HttpPost]
@@ -161,6 +161,17 @@ namespace Balcao.API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
+        [Route("GetUsuarioAtual")]
+        public IActionResult GetUsuarioAtual()
+        {
+            int idUsuario = TokenService.GetIdUsuario(User);
+            var usuario = _usuarioRepository.Get(idUsuario);
+
+            return Ok(usuario.ToJson());
+        }
+
+        [HttpGet]
         [AllowAnonymous]
         [Route("{idUsuario}/ListarAnuncios")]
         public IActionResult GetAnuncios(int idUsuario)
@@ -171,7 +182,7 @@ namespace Balcao.API.Controllers
                 return NotFound("Usuário não encontrado!");
             }
             var anuncios = _anuncioRepository.Query().Where(anuncio => anuncio.Proprietario.Id == idUsuario).ToList();
-            return Ok(anuncios);
+            return Ok(anuncios.Select(a => a.ToJson()));
         }
     }
 }

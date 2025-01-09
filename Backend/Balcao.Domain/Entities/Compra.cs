@@ -53,5 +53,19 @@
         {
             Status = StatusCompra.CANCELADO;
         }
+
+        public object ToJson()
+        {
+            return new
+            {
+                Id,
+                Quantidade,
+                Nota,
+                Status,
+                Comprador = Comprador.ToJson(),
+                Assunto = Assunto.ToJson(),
+                Mensagens
+            };
+        }
     }
 }
