@@ -42,11 +42,7 @@ namespace Balcao.Infrastructure.Mappings
 
             #region Relationships
 
-            builder.HasMany(u => u.ComprasAutor)
-                .WithOne(c => c.Autor)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            builder.HasMany(u => u.ComprasComprador)
+            builder.HasMany(u => u.Compras)
                 .WithOne(c => c.Comprador)
                 .OnDelete(DeleteBehavior.NoAction);
 

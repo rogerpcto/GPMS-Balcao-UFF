@@ -1,9 +1,11 @@
-﻿using Balcao.Domain.DTOs;
+﻿using Balcao.API.Services;
+using Balcao.Domain.DTOs;
 using Balcao.Domain.Entities;
 using Balcao.Domain.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Balcao_API.Controllers
+namespace Balcao.API.Controllers
 {
     [ApiController]
     [Route("[controller]s")]
@@ -23,6 +25,7 @@ namespace Balcao_API.Controllers
         #region Anúncio
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult List(string? consulta, DateTime? dataMinima, DateTime? dataMaxima, float? precoMinimo, float? precoMaximo)
         {
             var anuncios = _anuncioRepository.Query().Where(anuncio => anuncio.Ativo == true);
@@ -49,10 +52,11 @@ namespace Balcao_API.Controllers
                 anuncios = anuncios.Where(anuncio => termos.Any(termo => anuncio.Titulo.ToLower().Contains(termo) || anuncio.Descricao.ToLower().Contains(termo)));
             }
 
-            return Ok(anuncios.ToList());
+            return Ok(anuncios.Select(u => u.ToJson()).ToList());
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("{id}")]
         public IActionResult Get(int id)
         {
@@ -61,40 +65,77 @@ namespace Balcao_API.Controllers
             if (anuncio == null)
                 return NotFound("Anúncio não encontrado!");
 
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpGet]
-        [Route("listarAnunciosUsuario/{idUsuario}")]
-        public IActionResult GetAnunciosUsuario(int idUsuario)
-        {
-            var usuario = _usuarioRepository.Get(idUsuario);
-            if (usuario == null)
-            {
-                return NotFound("Usuário não encontrado!");
-            }
-            var anuncios = _anuncioRepository.Query().Where(anuncio => anuncio.Proprietario.Id == idUsuario).ToList();
-            return Ok(anuncios);
-        }
-
-        [HttpPut]
-        [Route("{id}")]
-        public IActionResult Update(int id, int usuarioId, AnuncioDTO anuncioDTO)
+        [Authorize]
+        [Route("{id}/Compras")]
+        public IActionResult GetCompras(int id)
         {
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
                 return NotFound("Anúncio não encontrado!");
 
-            var usuario = _usuarioRepository.Get(usuarioId);
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(anuncio.Proprietario, User))
+                return Unauthorized("Você não tem permissão para ver as compras deste anúncio!");
+
+            return Ok(anuncio.Compras.Select(c => c.ToJson()));
+        }
+
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult Create(AnuncioDTO anuncioDTO)
+        {
+            int idUsuario = TokenService.GetIdUsuario(User);
+            var usuario = _usuarioRepository.Get(idUsuario);
             if (usuario == null)
+                return NotFound("Usuário não encontrado!");
+
+            if (!TokenService.EhProprietario(usuario, User))
+                return Unauthorized("Você não tem permissão para criar anúncios para esse usuário!");
+
+            Anuncio anuncio = new Anuncio();
+            anuncio.Proprietario = usuario;
+            anuncio.Titulo = anuncioDTO.Titulo;
+            anuncio.Descricao = anuncioDTO.Descricao;
+            anuncio.Preco = anuncioDTO.Preco;
+            if (anuncioDTO.Quantidade.HasValue && anuncioDTO.Quantidade >= 0)
             {
-                return Unauthorized();
+                anuncio.Quantidade = anuncioDTO.Quantidade.Value;
             }
-            if (usuario.Id != anuncio.Proprietario.Id && usuario.Perfil == Perfil.USUARIO)
+            else
             {
-                return Unauthorized();
+                anuncio.Quantidade = -1;
             }
+
+            anuncio.Ativo = true;
+            DateTime dateTime = DateTime.UtcNow;
+            TimeZoneInfo horaBrasilia = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+            anuncio.DataCriacao = TimeZoneInfo.ConvertTimeFromUtc(dateTime, horaBrasilia);
+
+            _anuncioRepository.Add(anuncio);
+
+            return CreatedAtAction(
+                nameof(Get),
+                new { id = anuncio.Id },
+                anuncio.ToJson());
+        }
+
+        [HttpPut]
+        [Authorize]
+        [Route("{id}")]
+        public IActionResult Update(int id, AnuncioDTO anuncioDTO)
+        {
+            var anuncio = _anuncioRepository.Get(id);
+
+            if (anuncio == null)
+                return NotFound("Anúncio não encontrado!");
+
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(anuncio.Proprietario, User))
+                return Unauthorized("Você não tem permissão para alterar este anúncio!");
 
             anuncio.Titulo = anuncioDTO.Titulo;
             anuncio.Descricao = anuncioDTO.Descricao;
@@ -108,29 +149,26 @@ namespace Balcao_API.Controllers
                 anuncio.Quantidade = -1;
             }
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public IActionResult Delete(int id, int usuarioId, AnuncioDTO anuncioDTO)
+        [HttpPatch]
+        [Authorize]
+        [Route("{id}/Desativar")]
+        public IActionResult Desativar(int id, AnuncioDTO anuncioDTO)
         {
+            throw new NotImplementedException();
+
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
                 return NotFound("Anúncio não encontrado!");
 
-            var usuario = _usuarioRepository.Get(usuarioId);
-            if (usuario == null)
-            {
-                return Unauthorized();
-            }
-            if (usuario.Id != anuncio.Proprietario.Id && usuario.Perfil == Perfil.USUARIO) //adicionar condição tambem se usuario nao for do Perfil admin
-            {
-                return Unauthorized();
-            }
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(anuncio.Proprietario, User))
+                return Unauthorized("Você não tem permissão para desativar este anúncio!");
+
             _anuncioRepository.Delete(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         #endregion
@@ -138,6 +176,7 @@ namespace Balcao_API.Controllers
         #region Compra
 
         [HttpGet]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}")]
         public IActionResult GetCompra(int id, int idCompra)
         {
@@ -151,13 +190,37 @@ namespace Balcao_API.Controllers
             if (compra == null)
                 return NotFound("Compra não encontrada!");
 
-            return Ok(compra);
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(anuncio.Proprietario, User) && !TokenService.EhProprietario(compra.Comprador, User))
+                return Unauthorized("Você não tem permissão para acessar esta compra!");
+
+            return Ok(compra.ToJson());
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("ListarCompras")]
+        public IActionResult GetCompras()
+        {
+            int idUsuario = TokenService.GetIdUsuario(User);
+            var usuario = _usuarioRepository.Get(idUsuario);
+            if (usuario == null)
+            {
+                return NotFound("Usuário não encontrado!");
+            }
+
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(usuario, User))
+                return Unauthorized("Você não tem permissão para ver as compras deste usuário!");
+
+            return Ok(usuario.Compras.Select(c => c.ToJson()));
         }
 
         [HttpPost]
+        [Authorize]
         [Route("{id}/Compra")]
-        public IActionResult CreateCompra(int id, int idComprador, int quantidade)
+        public IActionResult CreateCompra(int id, int quantidade)
         {
+            int idComprador = TokenService.GetIdUsuario(User);
+
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
@@ -178,10 +241,11 @@ namespace Balcao_API.Controllers
             return CreatedAtAction(
                 nameof(GetCompra),
                 new { id = anuncio.Id, idCompra = compra.Id },
-                compra);
+                compra.ToJson());
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/AguardarPagamento")]
         public IActionResult AguardarPagamento(int id, int idCompra)
         {
@@ -198,13 +262,17 @@ namespace Balcao_API.Controllers
             if (compra.Status != StatusCompra.NEGOCIANDO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.NEGOCIANDO}!");
 
+            if (!TokenService.EhProprietario(anuncio.Proprietario, User))
+                return Unauthorized("Somente o proprietário pode mudar o status deste anúncio!");
+
             compra.AguardarPagamento();
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/EfetuarPagamento")]
         public IActionResult EfetuarPagamento(int id, int idCompra)
         {
@@ -221,13 +289,17 @@ namespace Balcao_API.Controllers
             if (compra.Status != StatusCompra.AGUARDANDO_PAGAMENTO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.AGUARDANDO_PAGAMENTO}!");
 
+            if (!TokenService.EhProprietario(compra.Comprador, User))
+                return Unauthorized("Somente o comprador pode mudar o status deste anúncio!");
+
             compra.EfetuarPagamento();
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/ConfirmarPagamento")]
         public IActionResult ConfirmarPagamento(int id, int idCompra)
         {
@@ -244,13 +316,17 @@ namespace Balcao_API.Controllers
             if (compra.Status != StatusCompra.PAGAMENTO_EFETUADO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.PAGAMENTO_EFETUADO}!");
 
+            if (!TokenService.EhProprietario(anuncio.Proprietario, User))
+                return Unauthorized("Somente o proprietário pode mudar o status deste anúncio!");
+
             compra.ConfirmarPagamento();
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/ConfirmarRecebimento")]
         public IActionResult ConfirmarRecebimento(int id, int idCompra)
         {
@@ -267,13 +343,17 @@ namespace Balcao_API.Controllers
             if (compra.Status != StatusCompra.PAGAMENTO_CONFIRMADO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.PAGAMENTO_CONFIRMADO}!");
 
+            if (!TokenService.EhProprietario(compra.Comprador, User))
+                return Unauthorized("Somente o comprador pode mudar o status deste anúncio!");
+
             compra.ConfirmarRecebimento();
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/AvaliarVendedor")]
         public IActionResult AvaliarVendedor(int id, int idCompra, float nota)
         {
@@ -290,13 +370,17 @@ namespace Balcao_API.Controllers
             if (compra.Status != StatusCompra.PRODUTO_RECEBIDO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.PRODUTO_RECEBIDO}!");
 
+            if (!TokenService.EhProprietario(compra.Comprador, User))
+                return Unauthorized("Somente o comprador pode mudar o status deste anúncio!");
+
             compra.AvaliarVendedor(nota);
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/AvaliarComprador")]
         public IActionResult AvaliarComprador(int id, int idCompra, float nota)
         {
@@ -313,13 +397,17 @@ namespace Balcao_API.Controllers
             if (compra.Status != StatusCompra.VENDEDOR_AVALIADO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.VENDEDOR_AVALIADO}!");
 
+            if (!TokenService.EhProprietario(anuncio.Proprietario, User))
+                return Unauthorized("Somente o proprietário pode mudar o status deste anúncio!");
+
             compra.AvaliarComprador(nota);
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/Concluir")]
         public IActionResult Concluir(int id, int idCompra)
         {
@@ -336,13 +424,17 @@ namespace Balcao_API.Controllers
             if (compra.Status != StatusCompra.COMPRADOR_AVALIADO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.COMPRADOR_AVALIADO}!");
 
+            if (!TokenService.EhProprietario(anuncio.Proprietario, User))
+                return Unauthorized("Somente o proprietário pode mudar o status deste anúncio!");
+
             compra.FecharCompra();
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         [HttpPatch]
+        [Authorize]
         [Route("{id}/Compra/{idCompra}/Cancelar")]
         public IActionResult Cancelar(int id, int idCompra)
         {
@@ -356,10 +448,13 @@ namespace Balcao_API.Controllers
             if (compra == null)
                 return NotFound("Compra não encontrada!");
 
+            if (!TokenService.EhProprietario(anuncio.Proprietario, User) && !TokenService.EhProprietario(compra.Comprador, User))
+                return Unauthorized("Você não tem permissão para acessar esta compra!");
+
             compra.CancelarCompra();
 
             _anuncioRepository.Update(anuncio);
-            return Ok(anuncio);
+            return Ok(anuncio.ToJson());
         }
 
         #endregion

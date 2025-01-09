@@ -79,9 +79,6 @@ namespace Balcao.Infrastructure.Migrations
                     b.Property<int>("AssuntoId")
                         .HasColumnType("int");
 
-                    b.Property<int>("AutorId")
-                        .HasColumnType("int");
-
                     b.Property<int>("CompradorId")
                         .HasColumnType("int");
 
@@ -99,8 +96,6 @@ namespace Balcao.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssuntoId");
-
-                    b.HasIndex("AutorId");
 
                     b.HasIndex("CompradorId");
 
@@ -210,21 +205,13 @@ namespace Balcao.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Balcao.Domain.Entities.Usuario", "Autor")
-                        .WithMany("ComprasAutor")
-                        .HasForeignKey("AutorId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Balcao.Domain.Entities.Usuario", "Comprador")
-                        .WithMany("ComprasComprador")
+                        .WithMany("Compras")
                         .HasForeignKey("CompradorId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Assunto");
-
-                    b.Navigation("Autor");
 
                     b.Navigation("Comprador");
                 });
@@ -258,9 +245,7 @@ namespace Balcao.Infrastructure.Migrations
 
             modelBuilder.Entity("Balcao.Domain.Entities.Usuario", b =>
                 {
-                    b.Navigation("ComprasAutor");
-
-                    b.Navigation("ComprasComprador");
+                    b.Navigation("Compras");
                 });
 #pragma warning restore 612, 618
         }

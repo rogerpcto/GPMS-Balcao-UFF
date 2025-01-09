@@ -63,7 +63,6 @@ namespace Balcao.Infrastructure.Migrations
                     Nota = table.Column<float>(type: "real", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CompradorId = table.Column<int>(type: "int", nullable: false),
-                    AutorId = table.Column<int>(type: "int", nullable: false),
                     AssuntoId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -73,11 +72,6 @@ namespace Balcao.Infrastructure.Migrations
                         name: "FK_Compras_Anuncios_AssuntoId",
                         column: x => x.AssuntoId,
                         principalTable: "Anuncios",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Compras_Usuarios_AutorId",
-                        column: x => x.AutorId,
-                        principalTable: "Usuarios",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Compras_Usuarios_CompradorId",
@@ -135,11 +129,6 @@ namespace Balcao.Infrastructure.Migrations
                 name: "IX_Compras_AssuntoId",
                 table: "Compras",
                 column: "AssuntoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Compras_AutorId",
-                table: "Compras",
-                column: "AutorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Compras_CompradorId",

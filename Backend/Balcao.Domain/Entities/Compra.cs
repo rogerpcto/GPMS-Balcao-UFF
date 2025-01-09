@@ -7,7 +7,6 @@
         public float Nota { get; set; } = -1;
         public StatusCompra Status { get; set; } = StatusCompra.NEGOCIANDO;
         public virtual Usuario Comprador { get; set; }
-        public virtual Usuario Autor { get; set; }
         public virtual Anuncio Assunto { get; set; }
         public virtual List<Mensagem> Mensagens { get; set; } = new List<Mensagem>();
 
@@ -35,7 +34,6 @@
         {
             Nota = nota;
             Assunto.Avaliar(nota);
-            Autor.Avaliar(nota);
             Status = StatusCompra.VENDEDOR_AVALIADO;
         }
 
@@ -54,6 +52,20 @@
         public void CancelarCompra()
         {
             Status = StatusCompra.CANCELADO;
+        }
+
+        public object ToJson()
+        {
+            return new
+            {
+                Id,
+                Quantidade,
+                Nota,
+                Status,
+                Comprador = Comprador.ToJson(),
+                Assunto = Assunto.ToJson(),
+                Mensagens
+            };
         }
     }
 }

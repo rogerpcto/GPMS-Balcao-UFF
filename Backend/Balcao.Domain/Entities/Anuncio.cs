@@ -32,7 +32,6 @@
         {
             var compra = new Compra();
 
-            compra.Autor = Proprietario;
             compra.Comprador = comprador;
             compra.Quantidade = quantidade;
             Compras.Add(compra);
@@ -44,12 +43,30 @@
         {
             int comprasConcluidas = Compras.Where(c => c.Status >= StatusCompra.VENDEDOR_AVALIADO).Count();
             Nota = ((Nota * comprasConcluidas) + nota) / (comprasConcluidas + 1);
+            Proprietario.Avaliar(nota);
         }
 
         public void FecharCompra(int quantidade)
         {
             if (!EhServico())
                 Quantidade -= quantidade;
+        }
+
+        public object ToJson()
+        {
+            return new
+            {
+                Id,
+                Titulo,
+                Descricao,
+                Ativo,
+                Nota,
+                DataCriacao,
+                Preco,
+                Quantidade,
+                Proprietario = Proprietario.ToJson(),
+                Imagem,
+            };
         }
     }
 }

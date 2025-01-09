@@ -1,9 +1,11 @@
+using Balcao.API.Services;
 using Balcao.Domain.DTOs;
 using Balcao.Domain.Entities;
 using Balcao.Domain.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Balcao_API.Controllers
+namespace Balcao.API.Controllers
 {
     [ApiController]
     [Route("[controller]s")]
@@ -21,15 +23,15 @@ namespace Balcao_API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult List()
         {
-            // Exemplo do uso de LINQ
-            //var usuarioLogan = _usuarioRepository.Query().Where(usuario => usuario.Nome == "Logan");
             var usuarios = _usuarioRepository.Query().ToList();
-            return Ok(usuarios);
+            return Ok(usuarios.Select(u => u.ToJson()));
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("{id}")]
         public IActionResult Get(int id)
         {
@@ -38,24 +40,60 @@ namespace Balcao_API.Controllers
             if (usuario == null)
                 return NotFound("Usuário não encontrado!");
 
-            return Ok(usuario);
+            return Ok(usuario.ToJson());
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult Create(UsuarioDTO usuarioDTO)
         {
+            if (string.IsNullOrEmpty(usuarioDTO.Nome) || string.IsNullOrEmpty(usuarioDTO.Email) || string.IsNullOrEmpty(usuarioDTO.Senha))
+            {
+                return BadRequest("Nome, e-mail e senha são obrigatórios!");
+            }
+
+            if (_usuarioRepository.Query().Any(u => u.Email.ToLower() == usuarioDTO.Email.ToLower()))
+                return BadRequest("Já existe um usuário com esse e-mail!");
+
             Usuario usuario = new Usuario();
             usuario.Nome = usuarioDTO.Nome;
             usuario.Senha = Usuario.Criptografar(usuarioDTO.Senha);
-            usuario.Email = usuarioDTO.Email;
+            usuario.Email = usuarioDTO.Email.ToLower();
+            usuario.Perfil = Perfil.USUARIO;
             _usuarioRepository.Add(usuario);
             return CreatedAtAction(
                 nameof(Get),
                 new { id = usuario.Id },
-                usuario);
+                usuario.ToJson());
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("CriarAdmin")]
+        public IActionResult CriarAdmin(UsuarioDTO usuarioDTO)
+        {
+            if (!TokenService.EhAdmin(User) && _usuarioRepository.Query().Any(u => u.Perfil == Perfil.ADMINISTRADOR))
+                return Unauthorized("Apenas administradores podem criar usuários administradores!");
+
+            if (string.IsNullOrEmpty(usuarioDTO.Nome) || string.IsNullOrEmpty(usuarioDTO.Email) || string.IsNullOrEmpty(usuarioDTO.Senha))
+            {
+                return BadRequest("Nome, e-mail e senha são obrigatórios!");
+            }
+
+            Usuario usuario = new Usuario();
+            usuario.Nome = usuarioDTO.Nome;
+            usuario.Senha = Usuario.Criptografar(usuarioDTO.Senha);
+            usuario.Email = usuarioDTO.Email.ToLower();
+            usuario.Perfil = Perfil.ADMINISTRADOR;
+            _usuarioRepository.Add(usuario);
+            return CreatedAtAction(
+                nameof(Get),
+                new { id = usuario.Id },
+                usuario.ToJson());
         }
 
         [HttpPut]
+        [Authorize]
         [Route("{id}")]
         public IActionResult Update(int id, UsuarioDTO usuarioDTO)
         {
@@ -64,14 +102,24 @@ namespace Balcao_API.Controllers
             if (usuario == null)
                 return NotFound("Usuário não encontrado!");
 
-            usuario.Nome = usuarioDTO.Nome;
-            usuario.Senha = usuarioDTO.Senha;
-            usuario.Email = usuarioDTO.Email;
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(usuario, User))
+                return Unauthorized("Você não tem permissão para alterar este usuário!");
+
+            if (string.IsNullOrEmpty(usuarioDTO.Nome))
+                usuario.Nome = usuarioDTO.Nome;
+
+            if (string.IsNullOrEmpty(usuarioDTO.Senha))
+                usuario.Senha = usuarioDTO.Senha;
+
+            if (string.IsNullOrEmpty(usuarioDTO.Email))
+                usuario.Email = usuarioDTO.Email.ToLower();
+
             _usuarioRepository.Update(usuario);
-            return Ok(usuario);
+            return Ok(usuario.ToJson());
         }
 
         [HttpDelete]
+        [Authorize]
         [Route("{id}")]
         public IActionResult Delete(int id)
         {
@@ -80,61 +128,61 @@ namespace Balcao_API.Controllers
             if (usuario == null)
                 return NotFound("Usuário não encontrado!");
 
-            _usuarioRepository.Delete(usuario);
-            return Ok(usuario);
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(usuario, User))
+                return Unauthorized("Você não tem permissão para apagar este usuário!");
+
+            try
+            {
+                _usuarioRepository.Delete(usuario);
+            }
+            catch
+            {
+                return BadRequest("Usuário não pode ser apagado por ter participado em anúncios.");
+            }
+
+            return Ok(usuario.ToJson());
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [Route("Login")]
-        public IActionResult Login(UsuarioDTO usuarioDTO)
+        public IActionResult Login(string email, string senha)
         {
-            var usuario = _usuarioRepository.Query().FirstOrDefault(x => x.Email == usuarioDTO.Email);
-            if (usuario == null)
+            var usuario = _usuarioRepository.Query().FirstOrDefault(x => x.Email == email);
+
+            if (usuario == null || !usuario.Logar(senha))
             {
-                return NotFound("Usuário não encontrado!");
+                return Unauthorized("Login ou senha incorretos!");
             }
 
-            if (!usuario.Logar(usuarioDTO.Senha))
-            {
-                return Unauthorized();
-            }
+            var token = TokenService.GenerateToken(usuario);
 
-            return Ok(usuario);
+            return Ok(new { message = "Login bem-sucedido", token });
         }
 
-        [HttpPost]
-        [Route("{id}/CriarAnuncio")]
-        public IActionResult Create(int id, AnuncioDTO anuncioDTO)
+        [HttpGet]
+        [Authorize]
+        [Route("GetUsuarioAtual")]
+        public IActionResult GetUsuarioAtual()
         {
-            var usuario = _usuarioRepository.Get(id);
+            int idUsuario = TokenService.GetIdUsuario(User);
+            var usuario = _usuarioRepository.Get(idUsuario);
+
+            return Ok(usuario.ToJson());
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("{idUsuario}/ListarAnuncios")]
+        public IActionResult GetAnuncios(int idUsuario)
+        {
+            var usuario = _usuarioRepository.Get(idUsuario);
             if (usuario == null)
+            {
                 return NotFound("Usuário não encontrado!");
-
-            Anuncio anuncio = new Anuncio();
-            anuncio.Proprietario = usuario;
-            anuncio.Titulo = anuncioDTO.Titulo;
-            anuncio.Descricao = anuncioDTO.Descricao;
-            anuncio.Preco = anuncioDTO.Preco;
-            if (anuncioDTO.Quantidade.HasValue && anuncioDTO.Quantidade >= 0)
-            {
-                anuncio.Quantidade = anuncioDTO.Quantidade.Value;
             }
-            else
-            {
-                anuncio.Quantidade = -1;
-            }
-
-            anuncio.Ativo = true;
-            DateTime dateTime = DateTime.UtcNow;
-            TimeZoneInfo horaBrasilia = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
-            anuncio.DataCriacao = TimeZoneInfo.ConvertTimeFromUtc(dateTime, horaBrasilia);
-
-            _anuncioRepository.Add(anuncio);
-
-            return CreatedAtAction(
-                nameof(Get),
-                new { id = anuncio.Id },
-                anuncio);
+            var anuncios = _anuncioRepository.Query().Where(anuncio => anuncio.Proprietario.Id == idUsuario).ToList();
+            return Ok(anuncios.Select(a => a.ToJson()));
         }
     }
 }
