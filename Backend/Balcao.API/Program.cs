@@ -1,3 +1,4 @@
+using Balcao.API.Services;
 using Balcao.Domain.Entities;
 using Balcao.Domain.Repositories;
 using Balcao.Infrastructure;
@@ -6,7 +7,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,7 +45,7 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Description = "Insira o token JWT no formato: Bearer {seu token}"
     });
-    c.OperationFilter<SecurityRequirementsOperationFilter>();
+    c.OperationFilter<SecurityRequirementOperationFilter>();
 });
 
 // Configuring JWT

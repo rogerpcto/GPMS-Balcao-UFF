@@ -1,5 +1,8 @@
 ﻿using Balcao.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -34,5 +37,34 @@ namespace Balcao.API.Services
         public static bool EhAdmin(ClaimsPrincipal usuarioAtual) => usuarioAtual.Claims.First(c => c.Type == ClaimTypes.Role).Value == Perfil.ADMINISTRADOR.ToString();
 
         public static bool EhProprietario(Usuario usuarioProprietario, ClaimsPrincipal usuarioAtual) => usuarioAtual.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value == usuarioProprietario.Id.ToString();
+    }
+    public class SecurityRequirementOperationFilter : IOperationFilter
+    {
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
+        {
+            var isAnonymous = context.MethodInfo.DeclaringType.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any() ||
+                              context.MethodInfo.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any();
+
+            if (isAnonymous)
+                return;
+
+            operation.Security = new List<OpenApiSecurityRequirement>
+        {
+            new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            }
+        };
+        }
     }
 }
