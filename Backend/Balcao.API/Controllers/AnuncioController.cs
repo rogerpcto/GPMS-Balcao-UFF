@@ -177,7 +177,7 @@ namespace Balcao.API.Controllers
 
         [HttpGet]
         [Authorize]
-        [Route("{id}/Compra/{idCompra}")]
+        [Route("{id}/Compras/{idCompra}")]
         public IActionResult GetCompra(int id, int idCompra)
         {
             var anuncio = _anuncioRepository.Get(id);
@@ -216,7 +216,7 @@ namespace Balcao.API.Controllers
 
         [HttpPost]
         [Authorize]
-        [Route("{id}/Compra")]
+        [Route("{id}/Compras")]
         public IActionResult CreateCompra(int id, int quantidade)
         {
             int idComprador = TokenService.GetIdUsuario(User);
@@ -246,7 +246,7 @@ namespace Balcao.API.Controllers
 
         [HttpPatch]
         [Authorize]
-        [Route("{id}/Compra/{idCompra}/AguardarPagamento")]
+        [Route("{id}/Compras/{idCompra}/AguardarPagamento")]
         public IActionResult AguardarPagamento(int id, int idCompra)
         {
             var anuncio = _anuncioRepository.Get(id);
@@ -273,7 +273,7 @@ namespace Balcao.API.Controllers
 
         [HttpPatch]
         [Authorize]
-        [Route("{id}/Compra/{idCompra}/EfetuarPagamento")]
+        [Route("{id}/Compras/{idCompra}/EfetuarPagamento")]
         public IActionResult EfetuarPagamento(int id, int idCompra)
         {
             var anuncio = _anuncioRepository.Get(id);
@@ -300,7 +300,7 @@ namespace Balcao.API.Controllers
 
         [HttpPatch]
         [Authorize]
-        [Route("{id}/Compra/{idCompra}/ConfirmarPagamento")]
+        [Route("{id}/Compras/{idCompra}/ConfirmarPagamento")]
         public IActionResult ConfirmarPagamento(int id, int idCompra)
         {
             var anuncio = _anuncioRepository.Get(id);
@@ -327,7 +327,7 @@ namespace Balcao.API.Controllers
 
         [HttpPatch]
         [Authorize]
-        [Route("{id}/Compra/{idCompra}/ConfirmarRecebimento")]
+        [Route("{id}/Compras/{idCompra}/ConfirmarRecebimento")]
         public IActionResult ConfirmarRecebimento(int id, int idCompra)
         {
             var anuncio = _anuncioRepository.Get(id);
@@ -354,7 +354,7 @@ namespace Balcao.API.Controllers
 
         [HttpPatch]
         [Authorize]
-        [Route("{id}/Compra/{idCompra}/AvaliarVendedor")]
+        [Route("{id}/Compras/{idCompra}/AvaliarVendedor")]
         public IActionResult AvaliarVendedor(int id, int idCompra, float nota)
         {
             var anuncio = _anuncioRepository.Get(id);
@@ -381,7 +381,7 @@ namespace Balcao.API.Controllers
 
         [HttpPatch]
         [Authorize]
-        [Route("{id}/Compra/{idCompra}/AvaliarComprador")]
+        [Route("{id}/Compras/{idCompra}/AvaliarComprador")]
         public IActionResult AvaliarComprador(int id, int idCompra, float nota)
         {
             var anuncio = _anuncioRepository.Get(id);
@@ -408,7 +408,7 @@ namespace Balcao.API.Controllers
 
         [HttpPatch]
         [Authorize]
-        [Route("{id}/Compra/{idCompra}/Concluir")]
+        [Route("{id}/Compras/{idCompra}/Concluir")]
         public IActionResult Concluir(int id, int idCompra)
         {
             var anuncio = _anuncioRepository.Get(id);
@@ -435,7 +435,7 @@ namespace Balcao.API.Controllers
 
         [HttpPatch]
         [Authorize]
-        [Route("{id}/Compra/{idCompra}/Cancelar")]
+        [Route("{id}/Compras/{idCompra}/Cancelar")]
         public IActionResult Cancelar(int id, int idCompra)
         {
             var anuncio = _anuncioRepository.Get(id);
@@ -455,6 +455,39 @@ namespace Balcao.API.Controllers
 
             _anuncioRepository.Update(anuncio);
             return Ok(anuncio.ToJson());
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("{id}/Compras/{idCompra}/Mensagens")]
+        public IActionResult Mensagem(int id, int idCompra, string texto)
+        {
+            var anuncio = _anuncioRepository.Get(id);
+
+            if (anuncio == null)
+                return NotFound("Anúncio não encontrado!");
+
+            var compra = anuncio.Compras.FirstOrDefault(c => c.Id == idCompra);
+
+            if (compra == null)
+                return NotFound("Compra não encontrada!");
+
+            bool proprietario = TokenService.EhProprietario(anuncio.Proprietario, User);
+
+            if (!proprietario && !TokenService.EhProprietario(compra.Comprador, User))
+                return Unauthorized("Você não tem permissão para mandar mensagem nesta compra!");
+
+            var mensagem = new Mensagem
+            {
+                Conteudo = texto,
+                TimeStamp = DateTime.Now,
+                Proprietario = proprietario
+            };
+
+            compra.Mensagens.Add(mensagem);
+            _anuncioRepository.Update(anuncio);
+
+            return Ok(mensagem.ToJson());
         }
 
         #endregion
