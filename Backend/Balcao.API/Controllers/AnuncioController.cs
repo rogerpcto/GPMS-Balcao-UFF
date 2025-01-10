@@ -157,8 +157,6 @@ namespace Balcao.API.Controllers
         [Route("{id}/Desativar")]
         public IActionResult Desativar(int id, AnuncioDTO anuncioDTO)
         {
-            throw new NotImplementedException();
-
             var anuncio = _anuncioRepository.Get(id);
 
             if (anuncio == null)
@@ -167,7 +165,9 @@ namespace Balcao.API.Controllers
             if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(anuncio.Proprietario, User))
                 return Unauthorized("Você não tem permissão para desativar este anúncio!");
 
-            _anuncioRepository.Delete(anuncio);
+            anuncio.Desativar();
+
+            _anuncioRepository.Update(anuncio);
             return Ok(anuncio.ToJson());
         }
 
@@ -225,6 +225,12 @@ namespace Balcao.API.Controllers
 
             if (anuncio == null)
                 return NotFound("Anúncio não encontrado!");
+
+            if (!anuncio.Ativo)
+                return BadRequest("Anúncio não está mais ativo!");
+
+            if (anuncio.Quantidade < quantidade)
+                return BadRequest("Quantidade solicitada maior que a quantidade disponível!");
 
             Usuario comprador = _usuarioRepository.Get(idComprador);
 

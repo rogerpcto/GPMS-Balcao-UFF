@@ -46,10 +46,26 @@
             Proprietario.Avaliar(nota);
         }
 
-        public void FecharCompra(int quantidade)
+        public void AtualizarQuantidade(int quantidade)
         {
             if (!EhServico())
+            {
                 Quantidade -= quantidade;
+                if (Quantidade <= 0)
+                {
+                    Desativar();
+                }
+            }
+        }
+
+        public void Desativar()
+        {
+            Ativo = false;
+            Compras.ForEach(c =>
+            {
+                if (c.Status < StatusCompra.PRODUTO_RECEBIDO)
+                    c.Status = StatusCompra.CANCELADO;
+            });
         }
 
         public object ToJson()

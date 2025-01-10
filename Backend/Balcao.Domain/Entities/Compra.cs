@@ -28,6 +28,7 @@
         public void ConfirmarRecebimento()
         {
             Status = StatusCompra.PRODUTO_RECEBIDO;
+            Assunto.AtualizarQuantidade(Quantidade);
         }
 
         public void AvaliarVendedor(float nota)
@@ -45,7 +46,6 @@
 
         public void FecharCompra()
         {
-            Assunto.FecharCompra(Quantidade);
             Status = StatusCompra.CONCLUIDO;
         }
 
