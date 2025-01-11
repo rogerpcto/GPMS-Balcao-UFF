@@ -182,6 +182,24 @@ namespace Balcao.API.Controllers
             return Ok(anuncio.ToJson());
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("TiposAnuncio")]
+        public IActionResult GetTiposAnuncio()
+        {
+            var tiposAnuncio = Enum.GetValues(typeof(TipoAnuncio));
+            return Ok(tiposAnuncio);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("Categorias")]
+        public IActionResult GetCategorias()
+        {
+            var categorias = Enum.GetValues(typeof(Categoria));
+            return Ok(categorias);
+        }
+
         #endregion
 
         #region Compra
