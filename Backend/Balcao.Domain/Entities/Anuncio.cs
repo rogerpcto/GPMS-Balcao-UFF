@@ -32,12 +32,16 @@
             Ativo = false;
         }
 
-        public Compra IniciarCompra(Usuario comprador, int quantidade)
+        public Compra IniciarCompra(Usuario autor, int quantidade)
         {
             var compra = new Compra();
 
-            compra.Comprador = comprador;
+            compra.Autor = autor;
             compra.Quantidade = quantidade;
+
+            if (TipoAnuncio == TipoAnuncio.BUSCA)
+                compra.Status = StatusCompra.AGUARDANDO_PAGAMENTO;
+
             Compras.Add(compra);
 
             return compra;
@@ -45,7 +49,7 @@
 
         public void Avaliar(float nota)
         {
-            int comprasConcluidas = Compras.Where(c => c.Status >= StatusCompra.VENDEDOR_AVALIADO).Count();
+            int comprasConcluidas = Compras.Where(c => c.Status >= StatusCompra.ANUNCIO_AVALIADO).Count();
             Nota = ((Nota * comprasConcluidas) + nota) / (comprasConcluidas + 1);
             Proprietario.Avaliar(nota);
         }

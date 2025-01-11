@@ -31,6 +31,9 @@ namespace Balcao.Infrastructure.Mappings
             builder.Property(u => u.Nota)
                 .IsRequired();
 
+            builder.Property(u => u.ComprasConcluidas)
+                .IsRequired();
+
             builder.Property(u => u.Perfil)
                 .IsRequired()
                 .HasConversion(
@@ -43,7 +46,7 @@ namespace Balcao.Infrastructure.Mappings
             #region Relationships
 
             builder.HasMany(u => u.Compras)
-                .WithOne(c => c.Comprador)
+                .WithOne(c => c.Autor)
                 .OnDelete(DeleteBehavior.NoAction);
 
             #endregion

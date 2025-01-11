@@ -54,18 +54,18 @@ namespace Balcao.Infrastructure.Migrations
                 values: new object[,]
                 {
                     { 1, 1, 4, 0.0f, 1, StatusCompra.NEGOCIANDO.ToString() },
-                    { 3, 1, 4, 0.0f, 1, StatusCompra.AGUARDANDO_PAGAMENTO.ToString() },
                     { 2, 2, 3, 0.0f, 2, StatusCompra.PAGAMENTO_CONFIRMADO.ToString() },
-                    { 4, 3, 5, 4.5f, 2, StatusCompra.VENDEDOR_AVALIADO.ToString() },
-                    { 10, 5, 3, 0.0f, 1, StatusCompra.PRODUTO_RECEBIDO.ToString() },
+                    { 3, 1, 4, 0.0f, 1, StatusCompra.AGUARDANDO_PAGAMENTO.ToString() },
+                    { 4, 3, 5, 4.5f, 2, StatusCompra.ANUNCIO_AVALIADO.ToString() },
                     { 5, 6, 2, 5.0f, 1, StatusCompra.CONCLUIDO.ToString() },
-                    { 6, 7, 5, 4.9f, 1, StatusCompra.COMPRADOR_AVALIADO.ToString() },
+                    { 6, 7, 5, 4.9f, 1, StatusCompra.COMPRA_AVALIADA.ToString() },
                     { 7, 8, 3, 0.0f, 1, StatusCompra.PAGAMENTO_EFETUADO.ToString() },
                     { 8, 9, 4, 4.8f, 1, StatusCompra.CONCLUIDO.ToString() },
                     { 9, 10, 5, 0.0f, 1, StatusCompra.NEGOCIANDO.ToString() },
+                    { 10, 5, 3, 0.0f, 1, StatusCompra.PRODUTO_RECEBIDO.ToString() },
                     { 11, 11, 4, 0.0f, 1, StatusCompra.NEGOCIANDO.ToString() },
                     { 12, 12, 2, 0.0f, 1, StatusCompra.AGUARDANDO_PAGAMENTO.ToString() },
-                    { 13, 13, 2, 5.0f, 1, StatusCompra.VENDEDOR_AVALIADO.ToString() },
+                    { 13, 13, 2, 5.0f, 1, StatusCompra.ANUNCIO_AVALIADO.ToString() },
                     { 14, 14, 2, 0.0f, 1, StatusCompra.CANCELADO.ToString() },
                 });
 

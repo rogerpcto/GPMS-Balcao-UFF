@@ -6,9 +6,12 @@
         public int Quantidade { get; set; }
         public float Nota { get; set; } = -1;
         public StatusCompra Status { get; set; } = StatusCompra.NEGOCIANDO;
-        public virtual Usuario Comprador { get; set; }
+        public virtual Usuario Autor { get; set; }
         public virtual Anuncio Assunto { get; set; }
         public virtual List<Mensagem> Mensagens { get; set; } = new List<Mensagem>();
+
+        public Usuario Comprador() => Assunto.TipoAnuncio == TipoAnuncio.OFERTA ? Autor : Assunto.Proprietario;
+        public Usuario Vendedor() => Assunto.TipoAnuncio != TipoAnuncio.OFERTA ? Autor : Assunto.Proprietario;
 
         public void AguardarPagamento()
         {
@@ -31,17 +34,17 @@
             Assunto.AtualizarQuantidade(Quantidade);
         }
 
-        public void AvaliarVendedor(float nota)
+        public void AvaliarAnuncio(float nota)
         {
             Nota = nota;
             Assunto.Avaliar(nota);
-            Status = StatusCompra.VENDEDOR_AVALIADO;
+            Status = StatusCompra.ANUNCIO_AVALIADO;
         }
 
-        public void AvaliarComprador(float nota)
+        public void Avaliar(float nota)
         {
-            Comprador.Avaliar(nota);
-            Status = StatusCompra.COMPRADOR_AVALIADO;
+            Autor.Avaliar(nota);
+            Status = StatusCompra.COMPRA_AVALIADA;
         }
 
         public void FecharCompra()
@@ -62,7 +65,7 @@
                 Quantidade,
                 Nota,
                 Status,
-                Comprador = Comprador.ToJson(),
+                Autor = Autor.ToJson(),
                 Assunto = Assunto.ToJson(),
                 Mensagens
             };

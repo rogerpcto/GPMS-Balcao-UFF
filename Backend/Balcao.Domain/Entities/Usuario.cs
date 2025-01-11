@@ -7,6 +7,7 @@
         public string Nome { get; set; }
         public string Senha { get; set; }
         public float Nota { get; set; }
+        public int ComprasConcluidas { get; set; }
         public virtual Perfil Perfil { get; set; }
         public virtual List<Compra> Compras { get; set; } = new List<Compra>();
 
@@ -28,8 +29,8 @@
 
         public void Avaliar(float nota)
         {
-            int comprasConcluidas = Compras.Where(c => c.Status >= StatusCompra.VENDEDOR_AVALIADO).Count() + Compras.Where(c => c.Status >= StatusCompra.COMPRADOR_AVALIADO).Count();
-            Nota = ((Nota * comprasConcluidas) + nota) / (comprasConcluidas + 1);
+            ComprasConcluidas++;
+            Nota = ((Nota * (ComprasConcluidas - 1)) + nota) / ComprasConcluidas;
         }
 
         public object ToJson()
