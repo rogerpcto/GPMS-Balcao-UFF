@@ -1,5 +1,3 @@
-using Balcao.Domain.Entities;
-using Balcao.Domain.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,12 +8,10 @@ namespace Balcao.API.Controllers
     public class ImagemController : ControllerBase
     {
         private readonly ILogger<UsuarioController> _logger;
-        private readonly IGenericRepository<Imagem> _imagemRepository;
 
-        public ImagemController(IGenericRepository<Imagem> imagemRepository, ILogger<UsuarioController> logger)
+        public ImagemController(ILogger<UsuarioController> logger)
         {
             _logger = logger;
-            _imagemRepository = imagemRepository;
         }
 
         [HttpGet]
@@ -35,7 +31,7 @@ namespace Balcao.API.Controllers
             return File(fileBytes, mimeType);
         }
 
-        private string GetMimeType(string filePath)
+        private static string GetMimeType(string filePath)
         {
             var extension = Path.GetExtension(filePath).ToLowerInvariant();
             return extension switch
