@@ -10,6 +10,10 @@
         public DateTime DataCriacao { get; set; }
         public float Preco { get; set; }
         public int Quantidade { get; set; }
+        public string Localizacao { get; set; }
+        public string Contato { get; set; }
+        public Categoria Categoria { get; set; }
+        public TipoAnuncio TipoAnuncio { get; set; }
         public virtual Usuario Proprietario { get; set; }
         public virtual List<Imagem> Imagem { get; set; } = new List<Imagem>();
         public virtual List<Compra> Compras { get; set; } = new List<Compra>();
@@ -79,7 +83,11 @@
                 Nota,
                 DataCriacao,
                 Preco,
+                Localizacao,
+                Contato,
                 Quantidade,
+                Categoria,
+                TipoAnuncio,
                 Proprietario = Proprietario.ToJson(),
                 Imagem,
             };
