@@ -184,5 +184,14 @@ namespace Balcao.API.Controllers
             var anuncios = _anuncioRepository.Query().Where(anuncio => anuncio.Proprietario.Id == idUsuario).ToList();
             return Ok(anuncios.Select(a => a.ToJson()));
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("Perfis")]
+        public IActionResult GetPerfis()
+        {
+            var perfils = Enum.GetValues(typeof(Perfil));
+            return Ok(perfils);
+        }
     }
 }
