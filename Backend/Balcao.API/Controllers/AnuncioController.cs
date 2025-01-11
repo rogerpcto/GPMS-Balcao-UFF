@@ -110,6 +110,11 @@ namespace Balcao.API.Controllers
             {
                 anuncio.Quantidade = -1;
             }
+            anuncio.Localizacao = anuncioDTO.Localizacao;
+            anuncio.Contato = anuncioDTO.Contato;
+            anuncio.Categoria = Enum.TryParse<Categoria>(anuncioDTO.Categoria, out var categoria) ? categoria : Categoria.OUTROS;
+            Enum.TryParse<TipoAnuncio>(anuncioDTO.TipoAnuncio, out var tipoAnuncio);
+            anuncio.TipoAnuncio = tipoAnuncio;
 
             anuncio.Ativo = true;
             DateTime dateTime = DateTime.UtcNow;
@@ -148,6 +153,12 @@ namespace Balcao.API.Controllers
             {
                 anuncio.Quantidade = -1;
             }
+            anuncio.Localizacao = anuncioDTO.Localizacao;
+            anuncio.Contato = anuncioDTO.Contato;
+            anuncio.Categoria = Enum.TryParse<Categoria>(anuncioDTO.Categoria, out var categoria) ? categoria : Categoria.OUTROS;
+            Enum.TryParse<TipoAnuncio>(anuncioDTO.TipoAnuncio, out var tipoAnuncio);
+            anuncio.TipoAnuncio = tipoAnuncio;
+
             _anuncioRepository.Update(anuncio);
             return Ok(anuncio.ToJson());
         }
@@ -155,7 +166,7 @@ namespace Balcao.API.Controllers
         [HttpPatch]
         [Authorize]
         [Route("{id}/Desativar")]
-        public IActionResult Desativar(int id, AnuncioDTO anuncioDTO)
+        public IActionResult Desativar(int id)
         {
             var anuncio = _anuncioRepository.Get(id);
 

@@ -6,6 +6,8 @@
         public string Descricao { get; set; }
         public float Preco { get; set; }
         public int? Quantidade { get; set; }
+        public string Localizacao { get; set; }
+        public string Contato { get; set; }
         public string Categoria { get; set; }
         public string TipoAnuncio { get; set; }
     }
