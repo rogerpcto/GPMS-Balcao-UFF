@@ -406,7 +406,7 @@ namespace Balcao.API.Controllers
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.PRODUTO_RECEBIDO}!");
 
             if (!TokenService.EhProprietario(compra.Autor, User))
-                return Unauthorized("Somente o proprietário do anúncio pode mudar o status deste anúncio!");
+                return Unauthorized("Somente o autor da compra pode mudar o status deste anúncio!");
 
             compra.AvaliarAnuncio(nota);
 
@@ -432,8 +432,8 @@ namespace Balcao.API.Controllers
             if (compra.Status != StatusCompra.ANUNCIO_AVALIADO)
                 return BadRequest($"Status da Compra inválida, atualmente é {compra.Status}, deveria ser {StatusCompra.ANUNCIO_AVALIADO}!");
 
-            if (!TokenService.EhProprietario(compra.Autor, User))
-                return Unauthorized("Somente o autor da Compra pode mudar o status deste anúncio!");
+            if (!TokenService.EhProprietario(anuncio.Proprietario, User))
+                return Unauthorized("Somente o proprietário do anúncio pode mudar o status deste anúncio!");
 
             compra.Avaliar(nota);
 
@@ -485,6 +485,9 @@ namespace Balcao.API.Controllers
 
             if (!TokenService.EhProprietario(compra.Vendedor(), User) && !TokenService.EhProprietario(compra.Comprador(), User))
                 return Unauthorized("Você não tem permissão para acessar esta compra!");
+
+            if (compra.Status == StatusCompra.CONCLUIDO)
+                return BadRequest("Compra já foi concluída!");
 
             compra.CancelarCompra();
 

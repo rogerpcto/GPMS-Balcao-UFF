@@ -63,7 +63,7 @@ namespace Balcao.Infrastructure.Migrations
                     { 8, 9, 4, 4.8f, 1, StatusCompra.CONCLUIDO.ToString() },
                     { 9, 10, 5, 0.0f, 1, StatusCompra.NEGOCIANDO.ToString() },
                     { 10, 5, 3, 0.0f, 1, StatusCompra.PRODUTO_RECEBIDO.ToString() },
-                    { 11, 11, 4, 0.0f, 1, StatusCompra.NEGOCIANDO.ToString() },
+                    { 11, 11, 4, 0.0f, 1, StatusCompra.AGUARDANDO_PAGAMENTO.ToString() },
                     { 12, 12, 2, 0.0f, 1, StatusCompra.AGUARDANDO_PAGAMENTO.ToString() },
                     { 13, 13, 2, 5.0f, 1, StatusCompra.ANUNCIO_AVALIADO.ToString() },
                     { 14, 14, 2, 0.0f, 1, StatusCompra.CANCELADO.ToString() },
