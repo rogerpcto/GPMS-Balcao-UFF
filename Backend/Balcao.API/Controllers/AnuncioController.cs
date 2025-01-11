@@ -52,7 +52,7 @@ namespace Balcao.API.Controllers
                 anuncios = anuncios.Where(anuncio => termos.Any(termo => anuncio.Titulo.ToLower().Contains(termo) || anuncio.Descricao.ToLower().Contains(termo)));
             }
 
-            return Ok(anuncios.Select(u => u.ToJson()).ToList());
+            return Ok(anuncios.ToList().Select(u => u.ToJson()).ToList());
         }
 
         [HttpGet]
@@ -494,6 +494,100 @@ namespace Balcao.API.Controllers
             _anuncioRepository.Update(anuncio);
 
             return Ok(mensagem.ToJson());
+        }
+
+        #endregion
+
+        #region Imagens
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("{id}/Imagens")]
+        public IActionResult GetImagens(int id)
+        {
+            var anuncio = _anuncioRepository.Get(id);
+
+            if (anuncio == null)
+                return NotFound("Anúncio não encontrado!");
+
+            return Ok(anuncio.Imagem);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("{id}/Imagens")]
+        public async Task<IActionResult> UploadImagem(int id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Arquivo inválido!");
+            }
+
+            var anuncio = _anuncioRepository.Get(id);
+
+            if (anuncio == null)
+                return NotFound("Anúncio não encontrado!");
+
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(anuncio.Proprietario, User))
+                return Unauthorized("Você não tem permissão para alterar este anúncio!");
+
+            string nomeArquivo = $"{id}_{anuncio.Imagem.Count + 1}" + Path.GetExtension(file.FileName);
+
+            var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "Imagens");
+            var filePath = Path.Combine(directoryPath, nomeArquivo);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            Imagem imagem = new Imagem();
+            imagem.Url = nomeArquivo;
+
+            anuncio.Imagem.Add(imagem);
+
+            _anuncioRepository.Update(anuncio);
+
+            var imageUrl = Url.Action("Get", "Imagem", new { fileName = imagem.Url });
+
+            return Created(imageUrl, imagem);
+        }
+
+        [HttpDelete]
+        [Authorize]
+        [Route("{id}/Imagens")]
+        public async Task<IActionResult> DeleteImagem(int id, string fileName)
+        {
+            var anuncio = _anuncioRepository.Get(id);
+
+            if (anuncio == null)
+                return NotFound("Anúncio não encontrado!");
+
+            if (!TokenService.EhAdmin(User) && !TokenService.EhProprietario(anuncio.Proprietario, User))
+                return Unauthorized("Você não tem permissão para alterar este anúncio!");
+
+            var imagem = anuncio.Imagem.FirstOrDefault(i => i.Url == fileName);
+
+            if (imagem == null)
+                return NotFound("Imagem não encontrada!");
+
+            var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "Imagens");
+            var filePath = Path.Combine(directoryPath, imagem.Url);
+
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+            else
+            {
+                return NotFound("Imagem não encontrada no servidor!");
+            }
+
+            anuncio.Imagem.Remove(imagem);
+
+            _anuncioRepository.Update(anuncio);
+
+            return Ok("Removido com sucesso!");
         }
 
         #endregion

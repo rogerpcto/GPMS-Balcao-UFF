@@ -85,12 +85,12 @@ namespace Balcao.Infrastructure.Migrations
                 columns: new[] { "Id", "Url", "AnuncioId" },
                 values: new object[,]
                 {
-                    { 1, "1_1", 1 },
-                    { 2, "1_2", 1 },
-                    { 3, "1_3", 1 },
-                    { 4, "2_1", 2 },
-                    { 5, "2_2", 2 },
-                    { 6, "2_3", 2 }
+                    { 1, "1_1.jpg", 1 },
+                    { 2, "1_2.jpg", 1 },
+                    { 3, "1_3.jpg", 1 },
+                    { 4, "2_1.jpg", 2 },
+                    { 5, "2_2.jpg", 2 },
+                    { 6, "2_3.jpg", 2 }
                 });
         }
 
