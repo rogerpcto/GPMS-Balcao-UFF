@@ -39,6 +39,28 @@ namespace Balcao.Infrastructure.Mappings
             builder.Property(a => a.Quantidade)
                 .IsRequired();
 
+            builder.Property(a => a.Localizacao)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            builder.Property(a => a.Contato)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            builder.Property(c => c.Categoria)
+                .IsRequired()
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (Categoria)Enum.Parse(typeof(Categoria), v))
+                .HasMaxLength(50);
+
+            builder.Property(c => c.TipoAnuncio)
+                .IsRequired()
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (TipoAnuncio)Enum.Parse(typeof(TipoAnuncio), v))
+                .HasMaxLength(50);
+
             #endregion
 
             #region Relationships

@@ -10,6 +10,10 @@
         public DateTime DataCriacao { get; set; }
         public float Preco { get; set; }
         public int Quantidade { get; set; }
+        public string Localizacao { get; set; }
+        public string Contato { get; set; }
+        public Categoria Categoria { get; set; }
+        public TipoAnuncio TipoAnuncio { get; set; }
         public virtual Usuario Proprietario { get; set; }
         public virtual List<Imagem> Imagem { get; set; } = new List<Imagem>();
         public virtual List<Compra> Compras { get; set; } = new List<Compra>();
@@ -28,12 +32,16 @@
             Ativo = false;
         }
 
-        public Compra IniciarCompra(Usuario comprador, int quantidade)
+        public Compra IniciarCompra(Usuario autor, int quantidade)
         {
             var compra = new Compra();
 
-            compra.Comprador = comprador;
+            compra.Autor = autor;
             compra.Quantidade = quantidade;
+
+            if (TipoAnuncio == TipoAnuncio.BUSCA)
+                compra.Status = StatusCompra.AGUARDANDO_PAGAMENTO;
+
             Compras.Add(compra);
 
             return compra;
@@ -41,7 +49,7 @@
 
         public void Avaliar(float nota)
         {
-            int comprasConcluidas = Compras.Where(c => c.Status >= StatusCompra.VENDEDOR_AVALIADO).Count();
+            int comprasConcluidas = Compras.Where(c => c.Status >= StatusCompra.ANUNCIO_AVALIADO).Count();
             Nota = ((Nota * comprasConcluidas) + nota) / (comprasConcluidas + 1);
             Proprietario.Avaliar(nota);
         }
@@ -80,6 +88,10 @@
                 DataCriacao,
                 Preco,
                 Quantidade,
+                Localizacao,
+                Contato,
+                Categoria,
+                TipoAnuncio,
                 Proprietario = Proprietario.ToJson(),
                 Imagem,
             };

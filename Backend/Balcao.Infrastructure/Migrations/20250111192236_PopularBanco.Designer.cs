@@ -4,6 +4,7 @@ using Balcao.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Balcao.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250111192236_PopularBanco")]
+    partial class PopularBanco
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,7 +102,7 @@ namespace Balcao.Infrastructure.Migrations
                     b.Property<int>("AssuntoId")
                         .HasColumnType("int");
 
-                    b.Property<int>("AutorId")
+                    b.Property<int>("CompradorId")
                         .HasColumnType("int");
 
                     b.Property<float>("Nota")
@@ -117,7 +120,7 @@ namespace Balcao.Infrastructure.Migrations
 
                     b.HasIndex("AssuntoId");
 
-                    b.HasIndex("AutorId");
+                    b.HasIndex("CompradorId");
 
                     b.ToTable("Compras");
                 });
@@ -182,9 +185,6 @@ namespace Balcao.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ComprasConcluidas")
-                        .HasColumnType("int");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -231,15 +231,15 @@ namespace Balcao.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Balcao.Domain.Entities.Usuario", "Autor")
+                    b.HasOne("Balcao.Domain.Entities.Usuario", "Comprador")
                         .WithMany("Compras")
-                        .HasForeignKey("AutorId")
+                        .HasForeignKey("CompradorId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Assunto");
 
-                    b.Navigation("Autor");
+                    b.Navigation("Comprador");
                 });
 
             modelBuilder.Entity("Balcao.Domain.Entities.Imagem", b =>
