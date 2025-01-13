@@ -26,10 +26,18 @@ namespace Balcao.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult List(string? consulta, DateTime? dataMinima, DateTime? dataMaxima, float? precoMinimo, float? precoMaximo)
+        public IActionResult List(string? consulta, DateTime? dataMinima, DateTime? dataMaxima, float? precoMinimo, float? precoMaximo, TipoAnuncio? tipoAnuncio, Categoria? categoria)
         {
             var anuncios = _anuncioRepository.Query().Where(anuncio => anuncio.Ativo == true);
 
+            if (tipoAnuncio.HasValue)
+            {
+                anuncios = anuncios.Where(anuncio => anuncio.TipoAnuncio == tipoAnuncio);
+            }
+            if (categoria.HasValue)
+            {
+                anuncios = anuncios.Where(anuncio => anuncio.Categoria == categoria);
+            }
             if (dataMinima.HasValue)
             {
                 anuncios = anuncios.Where(anuncio => anuncio.DataCriacao >= dataMinima);
