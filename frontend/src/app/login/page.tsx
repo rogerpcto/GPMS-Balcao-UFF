@@ -27,13 +27,13 @@ import { AlertCircle } from "lucide-react";
 import { login } from "../../data-access/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
+import { setAcessToken } from "@/lib/actions/handle-acess-token";
 
 const loginSchema = z.object({
   email: z
     .string()
-    .email("E-mail inválido")
-    .regex(/@id\.uff\.br$/, "O e-mail deve terminar com @id.uff.br"),
-  password: z.string().min(8, "A senha deve ter pelo menos 8 caracteres"),
+    .email("E-mail inválido"),
+  senha: z.string(),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -41,7 +41,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  const { setIsLoggedIn } = useAuth();
+  const { setIsLoggedIn, updateUser } = useAuth();
 
   const router = useRouter();
 
@@ -49,22 +49,22 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
-      password: "",
+      senha: "",
     },
   });
 
   const onSubmit = async (data: LoginFormValues) => {
-    try {
-      await login(data.email, data.password);
+    login(data.email, data.senha).then((res) => {
 
+      if (!res) return;
+
+      setAcessToken(res.token);
+      updateUser(res.token);
       setIsLoggedIn(true);
-
       router.push("/");
-    } catch (err: unknown) {
-      console.log(err);
-      setLoginError("Falha no login. Por favor, verifique suas credenciais.");
-    }
+    });
   };
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -91,7 +91,7 @@ export default function LoginPage() {
               />
               <FormField
                 control={form.control}
-                name="password"
+                name="senha"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Senha</FormLabel>
