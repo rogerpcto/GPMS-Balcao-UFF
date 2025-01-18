@@ -9,14 +9,31 @@ import {
   Shapes,
 } from "lucide-react";
 import Link from "next/link";
-import { Input } from "../../../../../balcao-uff/src/components/ui/input";
-import { Button } from "../../../../../balcao-uff/src/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/context/auth-context";
+import { getAds } from "@/data-access/advertisement";
+import { useProducts } from "@/context/products-context";
 
 export function Header() {
   const [searchTerm, setSearchTerm] = useState("");
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user } = useAuth();
+
+    const { setProducts } = useProducts();
+  
+
+    const searchProducts = () => {
+
+      if(!searchTerm) return;
+  
+      const searchParams = new URLSearchParams({ consulta: searchTerm });
+  
+      getAds(searchParams?.toString()).then(res=> {
+        if(!res) return;
+        setProducts(res);
+      })
+    }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -37,13 +54,6 @@ export function Header() {
             Criar um anúncio
           </Link>
           <Link
-            href="/chat"
-            className="text-sm font-medium transition-colors hover:text-primary"
-          >
-            <MessageCircle className="h-4 w-4 mr-2 inline-block" />
-            Chat
-          </Link>
-          <Link
             href="/meus-anuncios"
             className="text-sm font-medium transition-colors hover:text-primary"
           >
@@ -60,14 +70,14 @@ export function Header() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <Button size="sm" variant="ghost">
+          <Button size="sm" variant="ghost" onClick={() => searchProducts()}>
             <Search className="h-4 w-4" />
           </Button>
         </div>
 
         <nav className="flex items-center space-x-4 lg:space-x-6 mx-6">
           {isLoggedIn ? (
-            <Link href="/perfil/1">
+            <Link href={`/perfil/${user?.nameid}`}>
               <Button size="sm" variant="ghost">
                 <User className="h-4 w-4" />
               </Button>

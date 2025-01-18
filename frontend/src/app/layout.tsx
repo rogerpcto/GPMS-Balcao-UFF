@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/header";
 import AuthContextProvider from "@/context/auth-context";
 import { getAcessToken } from "@/lib/actions/handle-acess-token";
+import { ProductProvider } from "@/context/products-context";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,8 +35,10 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthContextProvider auth={token}>
-          <Header />
-          {children}
+          <ProductProvider>
+            <Header />
+            {children}
+          </ProductProvider>
         </AuthContextProvider>
       </body>
     </html>
