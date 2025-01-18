@@ -24,17 +24,17 @@ import {
 } from "@/components/ui/form";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { login } from "../../data-access/auth";
+import { login, register } from "../../data-access/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
+import { setAcessToken } from "@/lib/actions/handle-acess-token";
 
 const loginSchema = z.object({
   nome: z.string(),
   email: z
     .string()
-    .email("E-mail inválido")
-    .regex(/@id\.uff\.br$/, "O e-mail deve terminar com @id.uff.br"),
-  password: z.string().min(8, "A senha deve ter pelo menos 8 caracteres"),
+    .email("E-mail inválido"),
+  senha: z.string(),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -44,30 +44,26 @@ export default function LoginPage() {
 
   const router = useRouter();
 
-  const { setIsLoggedIn } = useAuth();
+  const { setIsLoggedIn, updateUser } = useAuth();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       nome: "",
       email: "",
-      password: "",
+      senha: "",
     },
   });
 
   const onSubmit = async (data: LoginFormValues) => {
-    try {
-      // Aqui você faria a chamada para sua API de autenticação
-      console.log("Login attempt:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    register(data).then(res => {
+      if (!res) return;
 
-      await login(data.email, data.password);
-      setIsLoggedIn(true);
-      router.push("/");
-    } catch (err: unknown) {
-      console.log(err);
-      setLoginError("Falha no login. Por favor, verifique suas credenciais.");
-    }
+          setAcessToken(res.token);
+          updateUser(res.token);
+          setIsLoggedIn(true);
+          router.push("/");
+      })
   };
 
   return (
@@ -112,7 +108,7 @@ export default function LoginPage() {
               />
               <FormField
                 control={form.control}
-                name="password"
+                name="senha"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Senha</FormLabel>

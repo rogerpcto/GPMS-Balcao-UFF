@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,152 +12,92 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
+import { getAds, getCategoria } from "@/data-access/advertisement";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { useProducts } from "@/context/products-context";
 
-// Simulated product data
-const products = [
-  {
-    id: 1,
-    name: "Produto",
-    image: "/imgs/produto.png",
-    date: "2023-07-01",
-    location: "São Paulo",
-    category: "eletronicos",
-    price: "99,99",
-  },
-  {
-    id: 2,
-    name: "Produto",
-    image: "/imgs/produto.png",
-    date: "2023-07-02",
-    location: "Rio de Janeiro",
-    price: "99,99",
-  },
-  {
-    id: 3,
-    name: "Produto",
-    image: "/imgs/produto.png",
-    date: "2023-07-03",
-    location: "Belo Horizonte",
-    price: "99,99",
-  },
-  {
-    id: 4,
-    name: "Produto",
-    image: "/imgs/produto.png",
-    date: "2023-07-01",
-    location: "São Paulo",
-    category: "eletronicos",
-    price: "99,99",
-  },
-  {
-    id: 5,
-    name: "Produto",
-    image: "/imgs/produto.png",
-    date: "2023-07-02",
-    location: "Rio de Janeiro",
-    price: "99,99",
-  },
-  {
-    id: 6,
-    name: "Produto",
-    image: "/imgs/produto.png",
-    date: "2023-07-03",
-    location: "Belo Horizonte",
-    price: "99,99",
-  },
-  {
-    id: 7,
-    name: "Produto",
-    image: "/imgs/produto.png",
-    date: "2023-07-01",
-    location: "São Paulo",
-    category: "eletronicos",
-    price: "99,99",
-  },
-  {
-    id: 8,
-    name: "Produto",
-    image: "/imgs/produto.png",
-    date: "2023-07-02",
-    location: "Rio de Janeiro",
-    price: "99,99",
-  },
-  {
-    id: 9,
-    name: "Produto",
-    price: "99,99",
-    image: "/imgs/produto.png",
-    date: "2023-07-03",
-    location: "Belo Horizonte",
-  },
-  {
-    id: 10,
-    name: "Produto",
-    price: "99,99",
-    image: "/imgs/produto.png",
-    date: "2023-07-01",
-    location: "São Paulo",
-    category: "eletronicos",
-  },
-  {
-    id: 11,
-    name: "Produto",
-    price: "99,99",
-    image: "/imgs/produto.png",
-    date: "2023-07-02",
-    location: "Rio de Janeiro",
-  },
-  {
-    id: 12,
-    name: "Produto",
-    price: "99,99",
-    image: "/imgs/produto.png",
-    date: "2023-07-03",
-    location: "Belo Horizonte",
-  },
-  {
-    id: 13,
-    name: "Produto",
-    price: "99,99",
-    image: "/imgs/produto.png",
-    date: "2023-07-01",
-    location: "São Paulo",
-    category: "eletronicos",
-  },
-  {
-    id: 14,
-    name: "Produto",
-    price: "99,99",
-    image: "/imgs/produto.png",
-    date: "2023-07-02",
-    location: "Rio de Janeiro",
-  },
-  {
-    id: 15,
-    name: "Produto",
-    price: "99,99",
-    image: "/imgs/produto.png",
-    date: "2023-07-03",
-    location: "Belo Horizonte",
-  },
+export interface Product {
+  id: number
+  titulo: string
+  descricao: string
+  ativo: boolean
+  nota: number
+  dataCriacao: string
+  preco: number
+  quantidade: number
+  proprietario: Proprietario
+  imagem: Imagem[]
+}
 
-  // Add more products as needed
-];
+export interface Proprietario {
+  id: number
+  nome: string
+  email: string
+  nota: number
+  perfil: string
+}
+
+export interface Imagem {
+  id: number
+  url: string
+}
+
+export function formatDate(inputDate: string) {
+  const date = new Date(inputDate);
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Os meses começam do 0
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}
+
 
 export default function Home() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [category, setCategory] = useState("");
-  const [location, setLocation] = useState("");
-  const [priceRange, setPriceRange] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
-  const filteredProducts = products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (category === "" || product.category === category) &&
-      (location === "" || product.location === location)
-    // Price range filter would be implemented here if we had price data
-  );
+  const [precoMinimo, setPrecoMinimo] = useState('')
+  const [precoMaximo, setPrecoMaximo] = useState('')
+  const [dataMinima, setDataMinima] = useState('')
+  const [dataMaxima, setDataMaxima] = useState('')
+  const [categories, setCategories] = useState([]);
+  const [category, setCategory] = useState('');
+
+  const { products, setProducts } = useProducts();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const searchParams = new URLSearchParams(
+      Object.entries({ precoMinimo, precoMaximo, dataMinima, dataMaxima, categoria: category })
+        .filter(([_, value]) => value !== '') 
+    );
+
+    getAds(searchParams?.toString()).then(res=> {
+      if(!res) return;
+      setProducts(res);
+    })
+  }
+
+  useEffect(() => { 
+    const fetchData = async () => {
+      getAds().then(res => {
+        setProducts(res);
+      });
+    };
+
+    const fetchCategories = async () => {
+      getCategoria().then(res => {
+        if(!res) return;
+        setCategories(res)
+      });
+    };
+
+    fetchData();
+    fetchCategories();
+  }, []);
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -173,64 +113,92 @@ export default function Home() {
         </div>
 
         {showFilters && (
-          <div className="flex space-x-4 mb-6">
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="eletronicos">Eletrônicos</SelectItem>
-                <SelectItem value="moveis">Móveis</SelectItem>
-                <SelectItem value="roupas">Roupas</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={location} onValueChange={setLocation}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Localização" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="sao-paulo">São Paulo</SelectItem>
-                <SelectItem value="rio-de-janeiro">Rio de Janeiro</SelectItem>
-                <SelectItem value="belo-horizonte">Belo Horizonte</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={priceRange} onValueChange={setPriceRange}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Faixa de Preço" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0-100">R$ 0 - R$ 100</SelectItem>
-                <SelectItem value="100-500">R$ 100 - R$ 500</SelectItem>
-                <SelectItem value="500+">R$ 500+</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-4 mb-8">
+            <div className="flex-1 min-w-[120px]">
+              <Label htmlFor="valorMinimo" className="mb-2 block">Catregoria</Label>
+              <Select onValueChange={(value) => {
+                setCategory(value)
+              }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione uma categoria" />
+                    </SelectTrigger>
+                    <SelectContent>
+                    {categories.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+            </div>
+            <div className="flex-1 min-w-[120px]">
+              <Label htmlFor="valorMinimo" className="mb-2 block">Valor Mínimo</Label>
+              <Input
+                id="valorMinimo"
+                type="number"
+                placeholder="0,00"
+                value={precoMinimo}
+                onChange={(e) => setPrecoMinimo(e.target.value)}
+              />
+            </div>
+            <div className="flex-1 min-w-[120px]">
+              <Label htmlFor="valorMaximo" className="mb-2 block">Valor Máximo</Label>
+              <Input
+                id="valorMaximo"
+                type="number"
+                placeholder="1000,00"
+                value={precoMaximo}
+                onChange={(e) => setPrecoMaximo(e.target.value)}
+              />
+            </div>
+            <div className="flex-1 min-w-[120px]">
+              <Label htmlFor="dataMinima" className="mb-2 block">Data Mínima</Label>
+              <Input
+                id="dataMinima"
+                type="date"
+                value={dataMinima}
+                onChange={(e) => setDataMinima(e.target.value)}
+              />
+            </div>
+            <div className="flex-1 min-w-[120px]">
+              <Label htmlFor="dataMaxima" className="mb-2 block">Data Máxima</Label>
+              <Input
+                id="dataMaxima"
+                type="date"
+                value={dataMaxima}
+                onChange={(e) => setDataMaxima(e.target.value)}
+              />
+            </div>
+            <Button type="submit" className="ml-auto">
+              Aplicar Filtros
+            </Button>
+          </form>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((product) => (
+          {products.length > 0 && products.map((product) => (
             <Link href={`/anuncio/${product.id}`} key={product.id}>
               <Card className="overflow-hidden">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-48 object-cover"
-                  width={500}
-                  height={500}
-                  priority
-                />
+                  <Image
+                    src={product?.imagem[0]?.url ? `http://localhost:5037/Imagens?fileName=${product?.imagem[0]?.url}` : `/imgs/produto.png`}
+                    alt={product.titulo}
+                    className="w-full h-48 object-cover"
+                    width={500}
+                    height={500}
+                    priority
+                  />
                 <CardContent className="p-4">
                   <div className="flex justify-between items-center">
-                    <h2 className="text-lg font-semibold">{product.name}</h2>
+                    <h2 className="text-lg font-semibold">{product.titulo}</h2>
                     <span className="text-xl font-bold">
-                      R$ {product.price}
+                      R$ {product.preco}
                     </span>
                   </div>
                   <p className="text-sm text-gray-500">
-                    Anunciado em: {product.date}
+                    Anunciado em: {formatDate(product.dataCriacao)}
                   </p>
                   <p className="text-sm text-gray-500">
-                    Localização: {product.location}
+                    Localização: {product.localizacao}
                   </p>
                 </CardContent>
               </Card>
