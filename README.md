@@ -54,7 +54,7 @@ Este projeto foi desenvolvido como trabalho da matéria de Gerência de Projetos
 ### Configuração do Frontend
 1. Navegue até o diretório do frontend.
 2. Execute `npm install` para instalar as dependências.
-3. Inicie o servidor de desenvolvimento com `npm start`.
+3. Inicie o servidor de desenvolvimento com `npm run dev`.
 
 ### Configuração do Backend
 1. Navegue até o diretório do backend.
